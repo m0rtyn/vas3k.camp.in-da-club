@@ -21,6 +21,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // --- Auth routes (mostly public, /me requires auth) ---
+app.get('/api/health', (c) => c.json({ ok: true }));
 app.use('/api/auth/me', authMiddleware);
 app.route('/api/auth', authRoutes);
 
