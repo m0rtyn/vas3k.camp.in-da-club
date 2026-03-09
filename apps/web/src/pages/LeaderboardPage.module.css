@@ -1,0 +1,86 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+}
+
+.rowSelf {
+  border-color: var(--color-accent);
+  background: rgba(255, 102, 0, 0.05);
+}
+
+.rank {
+  width: 32px;
+  font-weight: 700;
+  font-size: 16px;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.rankTop3 {
+  color: var(--color-accent);
+  font-size: 18px;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--color-border);
+}
+
+.avatarPlaceholder {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.name {
+  flex: 1;
+  font-weight: 500;
+}
+
+.anonymous {
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.empty {
+  text-align: center;
+  color: var(--color-text-secondary);
+  padding: 40px;
+}
+
+.loading {
+  text-align: center;
+  color: var(--color-text-secondary);
+  padding: 40px;
+}

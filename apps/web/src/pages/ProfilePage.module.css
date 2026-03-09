@@ -1,0 +1,27 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  padding-top: 20px;
+}
+
+.loading {
+  text-align: center;
+  color: var(--color-text-secondary);
+  padding: 40px;
+}
+
+.notFound {
+  text-align: center;
+  padding: 40px;
+}
+
+.ownProfileBadge {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  padding: 4px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+}

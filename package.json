@@ -1,0 +1,17 @@
+{
+  "name": "vklube",
+  "private": true,
+  "workspaces": ["packages/*", "apps/*"],
+  "devDependencies": {
+    "drizzle-kit": "^0.30.0"
+  },
+  "scripts": {
+    "dev:api": "bun run --filter api dev",
+    "dev:web": "bun run --filter web dev",
+    "build": "bun run --filter web build",
+    "start": "bun run --filter api start",
+    "db:generate": "bunx drizzle-kit generate",
+    "db:migrate": "bunx drizzle-kit migrate",
+    "db:studio": "bunx drizzle-kit studio"
+  }
+}

@@ -1,0 +1,41 @@
+.button {
+  width: 100%;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  transition: background 0.15s, transform 0.1s;
+}
+
+.button:active {
+  transform: scale(0.98);
+}
+
+.meet {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.meet:hover {
+  background: var(--color-accent-hover);
+}
+
+.meet:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.alreadyMet {
+  background: var(--color-surface);
+  color: var(--color-success);
+  border: 1px solid var(--color-success);
+  cursor: default;
+}
+
+.metDate {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+  text-align: center;
+}

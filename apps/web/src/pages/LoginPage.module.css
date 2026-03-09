@@ -1,0 +1,82 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.subtitle {
+  color: var(--color-text-secondary);
+  font-size: 15px;
+}
+
+.loginButton {
+  display: inline-block;
+  padding: 14px 40px;
+  background: var(--color-accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.loginButton:hover {
+  background: var(--color-accent-hover);
+  color: #fff;
+}
+
+.devSection {
+  margin-top: 24px;
+  padding: 16px;
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 300px;
+}
+
+.devTitle {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-bottom: 8px;
+}
+
+.devForm {
+  display: flex;
+  gap: 8px;
+}
+
+.devInput {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 14px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-family: inherit;
+}
+
+.devInput:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.devButton {
+  padding: 8px 16px;
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: 13px;
+}
