@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { serveStatic } from 'hono/bun';
+import path from 'path';
 import { authMiddleware } from './middleware/auth';
 import { adminMiddleware } from './middleware/admin';
 import authRoutes from './routes/auth';
@@ -43,14 +43,29 @@ app.use('/api/admin/*', authMiddleware, adminMiddleware);
 app.route('/api/admin', adminRoutes);
 
 // --- Static file serving (production: Vite build output) ---
-const staticRoot = process.env.NODE_ENV === 'production'
-  ? './apps/web/dist'
-  : '../web/dist';
+// Resolve relative to this file: src/index.ts → ../../web/dist
+const webDist = path.resolve(import.meta.dir, '../../web/dist');
 
-app.use('/*', serveStatic({ root: staticRoot }));
+app.get('/*', async (c, next) => {
+  // Skip API routes
+  if (c.req.path.startsWith('/api')) return next();
 
-// SPA fallback: serve index.html for any unmatched route
-app.use('/*', serveStatic({ root: staticRoot, path: 'index.html' }));
+  const filePath = path.join(webDist, c.req.path);
+  const file = Bun.file(filePath);
+  if (await file.exists()) {
+    return new Response(file);
+  }
+
+  // SPA fallback
+  const indexFile = Bun.file(path.join(webDist, 'index.html'));
+  if (await indexFile.exists()) {
+    return new Response(indexFile, {
+      headers: { 'Content-Type': 'text/html' },
+    });
+  }
+
+  return next();
+});
 
 export default {
   port: Number(process.env.PORT) || 3000,
