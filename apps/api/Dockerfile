@@ -11,6 +11,9 @@ RUN bun install --frozen-lockfile
 # Copy source
 COPY packages/ ./packages/
 COPY apps/ ./apps/
+COPY drizzle.config.ts ./
+COPY drizzle/ ./drizzle/
+COPY tsconfig.json ./
 
 # Build frontend
 RUN cd apps/web && bun run build

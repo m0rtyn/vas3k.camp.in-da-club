@@ -13,10 +13,12 @@ import syncRoutes from './routes/sync';
 const app = new Hono();
 
 // CORS for development
-app.use('/api/*', cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'],
-  credentials: true,
-}));
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/api/*', cors({
+    origin: ['http://localhost:5173', 'http://localhost:3000'],
+    credentials: true,
+  }));
+}
 
 // --- Auth routes (mostly public, /me requires auth) ---
 app.use('/api/auth/me', authMiddleware);
@@ -41,10 +43,14 @@ app.use('/api/admin/*', authMiddleware, adminMiddleware);
 app.route('/api/admin', adminRoutes);
 
 // --- Static file serving (production: Vite build output) ---
-app.use('/*', serveStatic({ root: '../web/dist' }));
+const staticRoot = process.env.NODE_ENV === 'production'
+  ? './apps/web/dist'
+  : '../web/dist';
+
+app.use('/*', serveStatic({ root: staticRoot }));
 
 // SPA fallback: serve index.html for any unmatched route
-app.use('/*', serveStatic({ root: '../web/dist', path: 'index.html' }));
+app.use('/*', serveStatic({ root: staticRoot, path: 'index.html' }));
 
 export default {
   port: Number(process.env.PORT) || 3000,
