@@ -1,21 +1,24 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { getReturnPath } from '../lib/auth';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { getReturnPath, setAuthToken } from '../lib/auth';
 
 /**
  * OIDC callback page.
- * In production: handles the authorization code from vas3k.club OIDC.
- * For now: redirects to the return path (actual OIDC token exchange happens server-side).
+ * Server redirects here with ?token={username} after successful OIDC auth.
+ * Stores token in localStorage and redirects to the return path.
  */
 export function CallbackPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    // TODO: In production OIDC flow, the server handles the callback
-    // and sets a session cookie. The client just needs to redirect.
+    const token = searchParams.get('token');
+    if (token) {
+      setAuthToken(token);
+    }
     const returnPath = getReturnPath();
     navigate(returnPath, { replace: true });
-  }, [navigate]);
+  }, [navigate, searchParams]);
 
   return (
     <div style={{ textAlign: 'center', padding: 40 }}>

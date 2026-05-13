@@ -1,4 +1,5 @@
 import type { Context, Next } from 'hono';
+import { getCookie } from 'hono/cookie';
 import { db } from '../db';
 import { users } from '../schema';
 import { eq } from 'drizzle-orm';
@@ -24,7 +25,7 @@ type Env = {
  * In dev mode (DEV_USER env var set), bypasses OIDC and uses that username.
  */
 export async function authMiddleware(c: Context<Env>, next: Next) {
-  // Check Bearer token / session cookie first (works with dev-login)
+  // Check Bearer token or session cookie
   const sessionToken = c.req.header('Authorization')?.replace('Bearer ', '')
     || getCookie(c, 'session');
 
@@ -57,16 +58,4 @@ export async function authMiddleware(c: Context<Env>, next: Next) {
   }
 
   return c.json({ error: 'unauthorized', message: 'Not authenticated' }, 401);
-}
-
-function getCookie(c: Context, name: string): string | undefined {
-  const cookieHeader = c.req.header('Cookie');
-  if (!cookieHeader) return undefined;
-
-  const match = cookieHeader
-    .split(';')
-    .map((s) => s.trim())
-    .find((s) => s.startsWith(`${name}=`));
-
-  return match?.split('=')[1];
 }

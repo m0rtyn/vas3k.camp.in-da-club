@@ -79,20 +79,20 @@ vas3k.camp.in-da-club/
 - Build command: `bun install && bun run --filter web build`
 - Start command: `bun run --filter api start`
 - The Hono app serves static files for `/*` and API routes under `/api/*`
-- Railway provides automatic HTTPS, custom domain support (`vk.vas3k.club` CNAME → Railway)
+- Railway provides automatic HTTPS, custom domain support (`vk.vas3k.cloud` CNAME → Railway)
 - Environment variables: `DATABASE_URL`, `OIDC_CLIENT_ID`, `OIDC_ISSUER`
 
 ### NFC Flow
 
 NFC chips contain standard NDEF URI records — **no Web NFC API needed** (it's Chrome-Android only). The OS handles everything:
 
-1. Each chip is pre-programmed with: `https://vk.vas3k.club/{username}`
+1. Each chip is pre-programmed with: `https://vk.vas3k.cloud/{username}`
 2. **Android**: user taps chip → URL opens in installed PWA (Chrome 139+) or browser
 3. **iOS**: user taps chip → URL opens in Safari → PWA loads as webpage (degraded but functional)
 4. PWA identifies the target user from the URL and shows their profile
 
 **Questions to ask the vas3k.club developer (Вастрик):**
-1. Can we use the subdomain `vk.vas3k.club`? What DNS setup is needed (CNAME to Railway)?
+1. Can we use the subdomain `vk.vas3k.cloud`? What DNS setup is needed (CNAME to Railway)?
 2. OIDC: what claims/scopes are returned? (slug, display_name, avatar_url, bio?) — reference: https://vas3k.club/post/openid
 3. ~~Is there an API endpoint to get the list of camp participants?~~ → Participant list will be provided as text after ticket sales close (~10 March).
 4. ~~Can we fetch a user's profile data without login?~~ → Likely not (many profiles are private). Profile data will only be available after the user logs in via OIDC. For NFC landing pages where the scanner is logged in but the target isn't: show minimal info (username only) until both are authenticated. Cached profile data from OIDC login is sufficient.
@@ -338,7 +338,7 @@ Achievements are displayed on the user's profile/dashboard. Can be single-winner
 
 ### Resolved Questions
 
-1. ✅ **Domain**: `vk.vas3k.club` — subdomain of the club. Need to confirm DNS setup with Вастрик.
+1. ✅ **Domain**: `vk.vas3k.cloud` — subdomain of the club. Need to confirm DNS setup with Вастрик.
 2. ✅ **OIDC**: reference at https://vas3k.club/post/openid. Detailed questions listed in NFC Flow section above.
 3. ✅ **NFC chip programming**: Handled by the team (not the developer).
 4. ⏳ **Auth preference**: OIDC vs pre-generated tokens — **TBD, asking the team**.

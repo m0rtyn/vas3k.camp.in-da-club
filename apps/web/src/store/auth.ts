@@ -20,16 +20,12 @@ export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
 
   fetchMe: async () => {
-    if (!getAuthToken()) {
-      set({ user: null, isLoading: false, isAuthenticated: false });
-      return;
-    }
-
     try {
       const user = await api.get<User>('/auth/me');
       await saveUser(user);
       set({ user, isLoading: false, isAuthenticated: true });
     } catch {
+      clearAuthToken();
       set({ user: null, isLoading: false, isAuthenticated: false });
     }
   },
