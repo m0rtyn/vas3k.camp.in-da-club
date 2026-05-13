@@ -5,7 +5,7 @@
     "dockerfilePath": "apps/api/Dockerfile"
   },
   "deploy": {
-    "startCommand": "bun apps/api/src/index.ts",
+    "startCommand": "bunx drizzle-kit migrate && bun apps/api/src/index.ts",
     "healthcheckPath": "/api/health",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10

@@ -18,6 +18,6 @@ COPY tsconfig.json ./
 # Build frontend
 RUN cd apps/web && bun run build
 
-# Run API (serves static files from apps/web/dist)
+# Run migrations on start, then run API (serves static files from apps/web/dist)
 EXPOSE 3000
-CMD ["bun", "apps/api/src/index.ts"]
+CMD ["sh", "-c", "bunx drizzle-kit migrate && bun apps/api/src/index.ts"]

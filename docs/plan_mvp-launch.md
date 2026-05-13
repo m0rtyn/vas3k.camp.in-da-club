@@ -36,11 +36,17 @@
 
 ---
 
-### Phase D: Railway Deploy (*после A + B*)
+### Phase D: Railway Deploy — DONE (config ready)
 
-9. [ ] **D1.** Проверить Dockerfile и railway.json — build/start команды
-10. [ ] **D2.** Настроить env vars в Railway: `DATABASE_URL`, `OIDC_*`, `NODE_ENV=production`
-11. [ ] **D3.** Применить миграции на prod БД
+9. [x] **D1.** Dockerfile и railway.json проверены — ✅ добавлен `bunx drizzle-kit migrate` в CMD/startCommand перед запуском сервера
+10. [ ] **D2.** Настроить env vars в Railway dashboard:
+    - `DATABASE_URL` — PostgreSQL (Railway addon)
+    - `OIDC_ISSUER=https://vas3k.club`
+    - `OIDC_CLIENT_ID` — получить на https://vas3k.club/apps/
+    - `OIDC_CLIENT_SECRET` — оттуда же
+    - `OIDC_REDIRECT_URI=https://<domain>/api/auth/callback`
+    - `NODE_ENV=production`
+11. [x] **D3.** Миграции — ✅ выполняются автоматически при каждом старте контейнера (idempotent)
 
 ---
 
