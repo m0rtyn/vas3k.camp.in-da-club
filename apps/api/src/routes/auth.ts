@@ -48,12 +48,13 @@ auth.get('/callback', async (c) => {
   // 1. Exchange authorization code for tokens
   const tokenRes = await fetch(`${issuer}/auth/openid/token`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': `Basic ${btoa(`${clientId}:${clientSecret}`)}`,
+    },
     body: new URLSearchParams({
       grant_type: 'authorization_code',
       code,
-      client_id: clientId,
-      client_secret: clientSecret,
       redirect_uri: redirectUri,
     }),
   });
@@ -64,6 +65,7 @@ auth.get('/callback', async (c) => {
   }
 
   const tokenData = await tokenRes.json() as { access_token: string; token_type: string };
+  console.log('OIDC token response:', JSON.stringify(tokenData));
 
   // 2. Fetch user profile from vas3k.club API
   const profileRes = await fetch(`${issuer}/user/me.json`, {
@@ -78,6 +80,7 @@ auth.get('/callback', async (c) => {
   const profileData = await profileRes.json() as {
     user: { slug: string; full_name: string; avatar: string; bio: string };
   };
+  console.log('OIDC profile response:', JSON.stringify(profileData));
 
   const { slug, full_name, avatar, bio } = profileData.user;
 
@@ -109,7 +112,8 @@ auth.get('/callback', async (c) => {
   });
 
   // Redirect to frontend callback page with token for localStorage
-  return c.redirect(`/callback?token=${encodeURIComponent(slug)}`);
+  const frontendOrigin = isProduction ? '' : (process.env.FRONTEND_URL || '');
+  return c.redirect(`${frontendOrigin}/callback?token=${encodeURIComponent(slug)}`);
 });
 
 /**
