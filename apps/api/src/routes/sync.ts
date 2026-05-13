@@ -157,8 +157,8 @@ async function processAction(
     }
 
     case 'witness_meeting': {
-      // Phase 2 — stub for now
-      throw new Error('Witness mechanic not yet implemented');
+      // Phase 2 — skip silently, don't break the batch
+      return { skipped: true, reason: 'Witness mechanic not yet implemented' };
     }
 
     default:

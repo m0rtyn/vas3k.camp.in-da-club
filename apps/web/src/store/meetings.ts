@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { api } from '../lib/api';
+import { getAuthToken } from '../lib/auth';
 import {
   saveMeeting,
   getAllMeetings,
@@ -55,10 +56,15 @@ export const useMeetingsStore = create<MeetingsState>((set, get) => ({
   createMeeting: async (targetUsername: string) => {
     const now = new Date().toISOString();
 
+    const initiator = getAuthToken();
+    if (!initiator) {
+      throw new Error('Not authenticated');
+    }
+
     // Optimistic local meeting
     const localMeeting: Meeting = {
       id: crypto.randomUUID(),
-      initiator_username: '', // Will be set from auth store
+      initiator_username: initiator,
       target_username: targetUsername,
       witness_code: null,
       witness_code_expires_at: null,

@@ -22,32 +22,32 @@
 
 ---
 
-### Phase B: Критические баги (*параллельно с A*)
+### Phase B: Критические баги — DONE
 
-5. **B1.** Fix пустой `initiator_username` при offline-создании встречи — meetings.ts
-6. **B2.** Fix `witness_meeting` ломает весь sync batch — sync.ts — не бросать exception, вернуть ошибку на уровне action
-7. **B3.** Добавить React Error Boundary — App.tsx
+5. [x] **B1.** Fix пустой `initiator_username` при offline-создании встречи~~ — ✅ берём username из `getAuthToken()`, throw если не авторизован
+6. [x] **B2.** Fix `witness_meeting` ломает весь sync batch~~ — ✅ возвращает `{ skipped: true }` вместо throw
+7. [x] **B3.** Добавить React Error Boundary~~ — ✅ class ErrorBoundary в App.tsx с кнопкой «Обновить»
 
 ---
 
 ### Phase C: UI cleanup (*параллельно с A и B, тривиально*)
 
-8. **C1.** Убрать пункт "Witness" из bottom nav — Layout.tsx
+8. [ ] **C1.** Убрать пункт "Witness" из bottom nav — Layout.tsx
 
 ---
 
 ### Phase D: Railway Deploy (*после A + B*)
 
-9. **D1.** Проверить Dockerfile и railway.json — build/start команды
-10. **D2.** Настроить env vars в Railway: `DATABASE_URL`, `OIDC_*`, `NODE_ENV=production`
-11. **D3.** Применить миграции на prod БД
+9. [ ] **D1.** Проверить Dockerfile и railway.json — build/start команды
+10. [ ] **D2.** Настроить env vars в Railway: `DATABASE_URL`, `OIDC_*`, `NODE_ENV=production`
+11. [ ] **D3.** Применить миграции на prod БД
 
 ---
 
 ### Phase E: Smoke-test (*после D*)
 
-12. **E1.** Локально: dev login → Dashboard → Meet → Contacts → Cancel/Hide → Leaderboard → Offline sync
-13. **E2.** Prod: OIDC login → тот же flow → PWA install
+12. [ ] **E1.** Локально: dev login → Dashboard → Meet → Contacts → Cancel/Hide → Leaderboard → Offline sync
+13. [ ] **E2.** Prod: OIDC login → тот же flow → PWA install
 
 ---
 

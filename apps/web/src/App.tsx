@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { Layout } from './components/Layout';
 import { DashboardPage } from './pages/DashboardPage';
 import { ProfilePage } from './pages/ProfilePage';
@@ -11,7 +12,8 @@ import { CallbackPage } from './pages/CallbackPage';
 
 export function App() {
   return (
-    <Routes>
+    <ErrorBoundary>
+      <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/callback" element={<CallbackPage />} />
 
@@ -25,5 +27,6 @@ export function App() {
         <Route path="/:username" element={<ProfilePage />} />
       </Route>
     </Routes>
+    </ErrorBoundary>
   );
 }
