@@ -78,10 +78,10 @@ export function Layout() {
             </NavLink>
           </li>
           <li>
-            <NavLink to="/witness" className={navLinkClass}>
+            <span className={`${styles.navLink} ${styles.navLinkDisabled}`}>
               <span className={styles.navIcon}>👁</span>
               Свидетель
-            </NavLink>
+            </span>
           </li>
         </ul>
       </nav>

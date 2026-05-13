@@ -30,9 +30,9 @@
 
 ---
 
-### Phase C: UI cleanup (*параллельно с A и B, тривиально*)
+### Phase C: UI cleanup — DONE
 
-8. [ ] **C1.** Убрать пункт "Witness" из bottom nav — Layout.tsx
+8. [x] **C1.** Задизейблить "Свидетель" в bottom nav — ✅ заменён `NavLink` на `<span>` с `opacity: 0.35` + `pointer-events: none`
 
 ---
 

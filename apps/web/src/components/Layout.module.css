@@ -92,3 +92,9 @@
 .logoutButton:hover {
   color: var(--color-error, #e53935);
 }
+
+.navLinkDisabled {
+  opacity: 0.35;
+  pointer-events: none;
+  cursor: default;
+}
