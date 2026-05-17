@@ -1,3 +1,7 @@
+---
+applyTo: **/*
+---
+
 # ВКлубе — Copilot Instructions
 
 ## Project Overview
