@@ -2,6 +2,10 @@
 
 Геймифицированное приложение для знакомств на кэмпе с NFC-чипами.
 
+**Прод:** https://vk.vas3k.cloud  
+**Статус:** MVP задеплоен, работает. Witness-механика (Phase 2) в разработке.  
+**Кэмп:** начало июня 2026, 4 дня.
+
 ## Стек
 
 - **Monorepo**: Bun workspaces
@@ -42,13 +46,21 @@ bun run dev:web
 ├── apps/
 │   ├── api/            # Hono API (Bun runtime)
 │   └── web/            # React 19 PWA (Vite)
-└── drizzle/            # Миграции БД
+├── drizzle/            # Миграции БД
+└── docs/               # Документация и планы
 ```
 
 ## Dev-режим авторизации
 
 Для разработки без настроенного OIDC — установите `DEV_USER=username` в `.env`. Это позволит работать от имени любого пользователя без авторизации через vas3k.club.
 
+> ⚠️ В production (NODE_ENV=production) DEV_USER игнорируется — работает только OIDC через vas3k.club.
+
 ## Деплой
 
 Проект деплоится на Railway как один сервис. Hono отдаёт статику фронтенда из `apps/web/dist/` и API на `/api/*`.
+
+Env vars для Railway:
+- `DATABASE_URL` — PostgreSQL connection string
+- `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_REDIRECT_URI` — vas3k.club OIDC
+- `NODE_ENV=production`

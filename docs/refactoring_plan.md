@@ -1,26 +1,26 @@
-# План рефакторинга прототипа ВКлубе
+# План рефакторинга ВКлубе
 
-Статус: прототип Phase 1 (MVP) — базовая структура, dev-авторизация, CRUD встреч, offline-first каркас. OIDC и Witness не реализованы. Ниже — план приведения кодовой базы в состояние, пригодное для продакшн-разработки.
+Статус: **MVP задеплоен и работает в проде** (`vk.vas3k.cloud`). OIDC-авторизация реализована. Witness-механика отключена (Phase 2). Ниже — оставшиеся задачи по улучшению кодовой базы.
 
 ---
 
 ## 0. Обзор текущих проблем
 
-### Критические (блокеры)
-| # | Проблема | Файл | Суть |
-|---|----------|------|------|
-| C1 | Пустой `initiator_username` при офлайн-создании встречи | `apps/web/src/store/meetings.ts` | Оптимистичная встреча создаётся с `initiator_username: ''`, т.к. auth store не подключён |
-| C2 | OIDC callback — заглушка | `apps/api/src/routes/auth.ts` | 4 TODO, обмен code→token/upsert не реализованы |
-| C3 | `witness_meeting` бросает ошибку в sync | `apps/api/src/routes/sync.ts` | Если клиент отправит witness-действие — весь batch ломается |
-| C4 | Нет React Error Boundary | `apps/web/src/` | Любая ошибка в компоненте крашит всё приложение |
+### ✅ Исправлено (архив)
+| # | Проблема | Статус |
+|---|----------|--------|
+| C1 | Пустой `initiator_username` при офлайн-создании встречи | ✅ Исправлено |
+| C2 | OIDC callback — заглушка | ✅ Полностью реализовано |
+| C3 | `witness_meeting` бросает ошибку в sync | ✅ Возвращает `{ skipped: true }` |
+| C4 | Нет React Error Boundary | ✅ Добавлен |
+| H2 | DEV_USER bypass в проде | ✅ Защищён `NODE_ENV !== 'production'` |
+| H3 | Парсинг cookie вручную | ✅ Используется `hono/cookie` |
+| H4 | Нет валидации `amount > 0` в admin grants | ✅ Есть проверка |
 
 ### Высокий приоритет
 | # | Проблема | Файл |
 |---|----------|------|
-| H1 | `AuthGuard` делает `window.location.href` вместо роутерной навигации | `AuthGuard.tsx` |
-| H2 | DEV_USER bypass доступен если env var случайно попал в прод | `middleware/auth.ts` |
-| H3 | Парсинг cookie вручную строковым сплитом | `middleware/auth.ts` |
-| H4 | Нет валидации `amount > 0` в admin grants (исправлено — уже есть проверка) | `routes/admin.ts` |
+| H1 | `AuthGuard` делает `window.location.href` вместо роутерной навигации | `AuthGuard.tsx`, `lib/auth.ts` |
 | H5 | Приведение типов через `unknown` в leaderboard | `routes/leaderboard.ts` |
 | H6 | `logout` в Layout делает полный page reload | `Layout.tsx` |
 
@@ -31,7 +31,6 @@
 | M2 | Нет backoff/retry при ошибках синхронизации |
 | M3 | Нет индексов на FK-столбцах и `created_at` в БД |
 | M4 | ProfilePage вызывает `fetchMeetings()` при каждом изменении username |
-| M5 | Дублирование static file serving в Hono |
 | M6 | Leaderboard использует raw SQL вместо Drizzle query builder |
 | M7 | `hide`/`unhide` в store используют хардкод `'self'` вместо реального username |
 
@@ -87,61 +86,15 @@
 - Создать: `apps/api/src/middleware/error.ts`
 - Изменить: `apps/api/src/index.ts`, все `routes/*.ts`
 
-### 1.3 Валидация входных данных
+### 1.3 Валидация входных данных (будущее)
 
-**Что:** Добавить schema-валидацию для всех API-эндпоинтов.
-
-**Зачем:** Сейчас валидация минимальна и ручная (проверки `if (!field)`). Нет защиты от невалидных типов, XSS в строках, слишком длинных значений.
-
-**Как:**
-- Использовать `zod` (или `valibot` для меньшего бандла) — обе библиотеки хорошо интегрируются с Hono через `@hono/zod-validator`
-- Определить схемы в `packages/shared/src/schemas.ts`
-- Применить middleware валидации в route-хэндлерах
-
-**Файлы:**
-- Создать: `packages/shared/src/schemas.ts`
-- Изменить: `packages/shared/src/index.ts` (реэкспорт)
-- Изменить: `apps/api/src/routes/*.ts` (подключить валидатор)
-- `package.json` — добавить `zod` или `valibot`
+Использовать `zod` + `@hono/zod-validator` для schema-валидации API-эндпоинтов. Отложено — не блокирует запуск.
 
 ---
 
-## 2. Исправление критических багов
+## 2. Открытые баги
 
-### 2.1 Пустой `initiator_username` при офлайн-создании (C1)
-
-**Проблема:** В `apps/web/src/store/meetings.ts:62` оптимистичная встреча создаётся с `initiator_username: ''`.
-
-**Решение:**
-```ts
-// meetings.ts — createMeeting
-createMeeting: async (targetUsername: string) => {
-  const currentUser = useAuthStore.getState().user;
-  if (!currentUser) throw new Error('Not authenticated');
-  
-  const localMeeting: Meeting = {
-    // ...
-    initiator_username: currentUser.username, // вместо ''
-    // ...
-  };
-```
-
-**Файлы:** `apps/web/src/store/meetings.ts`
-
-### 2.2 React Error Boundary (C4)
-
-**Что:** Обернуть приложение в Error Boundary для graceful degradation.
-
-**Как:**
-- Создать `apps/web/src/components/ErrorBoundary.tsx` (class component с `componentDidCatch`)
-- Обернуть `<Routes>` в `App.tsx`
-- Показывать пользователю «Что-то пошло не так» с кнопкой «Обновить»
-
-**Файлы:**
-- Создать: `apps/web/src/components/ErrorBoundary.tsx`
-- Изменить: `apps/web/src/App.tsx`
-
-### 2.3 Хардкод `'self'` в hide/unhide (M7)
+### 2.1 Хардкод `'self'` в hide/unhide (M7)
 
 **Проблема:** В `store/meetings.ts` при `hideMeeting` в `hidden_by` добавляется строка `'self'`, а сервер использует реальный `username`. После синхронизации локальное и серверное состояние расходятся.
 
@@ -157,60 +110,9 @@ hideMeeting: async (meetingId: string) => {
 
 ---
 
-## 3. Авторизация
+## 3. Навигация и UX
 
-### 3.1 Реализация OIDC callback (C2)
-
-**Что:** Полноценный OIDC flow с vas3k.club.
-
-**Как:**
-1. В `GET /api/auth/callback`:
-   - Обменять `code` на access_token через POST к token endpoint
-   - Получить userinfo (или декодировать id_token)
-   - Upsert пользователя в БД (slug → username, full_name, avatar, bio)
-   - Создать безопасный session token (crypto.randomUUID), сохранить в таблице sessions или в самом user
-   - Установить httpOnly cookie `session=<token>` и редиректнуть на `/`
-
-2. В `authMiddleware`:
-   - Валидировать session token из cookie (не username как сейчас!)
-   - Текущая схема dev-авторизации (username = token) — дыра в безопасности для прода
-
-3. Добавить таблицу `sessions` (или поле `session_token` в `users`):
-   ```
-   sessions: id (uuid), user_username (FK), token (text unique), expires_at, created_at
-   ```
-
-**Файлы:**
-- Изменить: `apps/api/src/routes/auth.ts`
-- Изменить: `apps/api/src/middleware/auth.ts`
-- Изменить/создать: `apps/api/src/schema.ts` (таблица sessions)
-- Новая миграция Drizzle
-
-### 3.2 Защита DEV_USER bypass (H2)
-
-**Текущая проблема:** Если ENV `DEV_USER` установлен — авторизация обходится. Проверка `NODE_ENV !== 'production'` есть, но она неявная.
-
-**Решение:**
-```ts
-// middleware/auth.ts
-if (devUser && process.env.NODE_ENV === 'development') { // строгое сравнение
-```
-Дополнительно: в продакшн-билде убрать fallback полностью через compile-time flag.
-
-**Файлы:** `apps/api/src/middleware/auth.ts`
-
-### 3.3 Парсинг cookie (H3)
-
-**Решение:** Использовать встроенный `hono/cookie`:
-```ts
-import { getCookie } from 'hono/cookie';
-const session = getCookie(c, 'session');
-```
-Удалить ручную функцию `getCookie`.
-
-**Файлы:** `apps/api/src/middleware/auth.ts`
-
-### 3.4 AuthGuard и навигация (H1, H6)
+### 3.1 AuthGuard и навигация (H1, H6)
 
 **Проблема:** `redirectToLogin()` в `lib/auth.ts` делает `window.location.href = '/login'` — полная перезагрузка страницы, потеря состояния.
 
@@ -237,7 +139,7 @@ useEffect(() => {
 
 ### 4.1 Обработка ошибок sync (M1)
 
-**Проблема:** В `lib/sync.ts:39` ошибки глотаются пустым catch. Пользователь не знает, что синхронизация сломана.
+**Проблема:** В `lib/sync.ts` ошибки глотаются пустым catch. Пользователь не знает, что синхронизация сломана.
 
 **Решение:**
 - Логировать ошибки: `console.error('Sync failed:', err)`
@@ -267,19 +169,6 @@ backoffMs = 30_000; // reset
 
 **Файлы:** `apps/web/src/lib/sync.ts`
 
-### 4.3 Устойчивость batch sync к частичным ошибкам (C3)
-
-**Проблема:** Если один item в batch — `witness_meeting` — весь sync ломается.
-
-**Решение на клиенте:** При получении `results` — помечать synced только успешные. Неуспешные оставлять в очереди, но добавить поле `retry_count` и `last_error` в sync queue. После 5 неудачных попыток — помечать как `failed` и уведомлять пользователя.
-
-**Решение на сервере:** `witness_meeting` не должен бросать ошибку — вернуть `{ success: false, error: 'not_implemented' }` (уже так работает через try/catch, но стоит явно обработать).
-
-**Файлы:**
-- `apps/web/src/lib/db.ts` (добавить retry_count, last_error в syncQueue schema)
-- `apps/web/src/lib/sync.ts` (обработка partial failures)
-- `apps/api/src/routes/sync.ts` (уже ок, но добавить обработку unknown actions)
-
 ---
 
 ## 5. База данных
@@ -297,34 +186,16 @@ CREATE INDEX idx_meetings_created_at ON meetings (created_at DESC);
 CREATE INDEX idx_approval_grants_granted_to ON approval_grants (granted_to);
 ```
 
-**Как:** Новая миграция Drizzle: `drizzle/migrations/0001_add_indexes.sql`
+**Как:** Новая миграция Drizzle: `bun run db:generate`
 
 **Файлы:**
 - `apps/api/src/schema.ts` (добавить index-определения)
-- Запустить `bun drizzle-kit generate`
 
-### 5.2 Таблица sessions (связано с 3.1)
+### 5.2 Leaderboard: замена raw SQL (M6, H5)
 
-Для production OIDC — нужна таблица сессий вместо текущей схемы «username = token».
+**Проблема:** `result as unknown as Array<{...}>` — потеря type safety. Используется raw SQL вместо Drizzle query builder.
 
-### 5.3 Leaderboard: типизация raw SQL (H5)
-
-**Проблема:** `result as unknown as Array<{...}>` — потеря type safety.
-
-**Решение:** Использовать `db.execute<T>()` с типами или переписать на Drizzle subqueries:
-```ts
-const meetingCounts = db.$with('meeting_counts').as(
-  db.select({
-    username: meetings.initiator_username,
-    count: sql<number>`count(*)`.as('confirmed_count'),
-  })
-  .from(meetings)
-  .where(eq(meetings.status, 'confirmed'))
-  // ...
-);
-```
-
-Если raw SQL оправдан сложностью запроса — как минимум обернуть в типизированную функцию с runtime-проверкой.
+**Решение:** Переписать на Drizzle subqueries или как минимум обернуть в типизированную функцию.
 
 **Файлы:** `apps/api/src/routes/leaderboard.ts`
 
@@ -334,13 +205,10 @@ const meetingCounts = db.$with('meeting_counts').as(
 
 ### 6.1 Устранение бесконечных перезапросов (M4)
 
-**Проблема:** `ProfilePage` вызывает `fetchMeetings()` в `useEffect` с `[username, fetchMeetings]` в deps. `fetchMeetings` — нестабильная ссылка → бесконечный ререндер.
+**Проблема:** `ProfilePage` вызывает `fetchMeetings()` в `useEffect` с `[username, fetchMeetings]` в deps. `fetchMeetings` — нестабильная ссылка → лишние вызовы.
 
-**Решение:** Использовать Zustand selector для стабильной ссылки или `useRef`:
+**Решение:** Убрать `fetchMeetings` из deps:
 ```tsx
-const fetchMeetings = useMeetingsStore((s) => s.fetchMeetings);
-// Zustand selectors уже стабильны, но стоит проверить.
-// Альтернатива: вынести fetch из useEffect deps.
 useEffect(() => {
   fetchMeetings();
 }, [username]); // fetchMeetings убрать из deps
