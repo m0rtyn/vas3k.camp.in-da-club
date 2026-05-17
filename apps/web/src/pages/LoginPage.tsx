@@ -1,21 +1,31 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/auth';
 import { getReturnPath } from '../lib/auth';
 import styles from './LoginPage.module.css';
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { devLogin } = useAuthStore();
   const [devUsername, setDevUsername] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const returnTo = (location.state as { returnTo?: string })?.returnTo;
+
+  // Save returnTo for OIDC callback flow (full page navigation loses router state)
+  useEffect(() => {
+    if (returnTo) {
+      localStorage.setItem('auth_return_to', returnTo);
+    }
+  }, [returnTo]);
 
   const handleDevLogin = async () => {
     if (!devUsername.trim()) return;
     setIsLoading(true);
     try {
       await devLogin(devUsername.trim());
-      navigate(getReturnPath());
+      navigate(returnTo || getReturnPath());
     } catch {
       alert('Ошибка входа');
     }

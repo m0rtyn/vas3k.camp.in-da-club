@@ -1,4 +1,4 @@
-import { Outlet, NavLink } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { useAuthStore } from '../store/auth';
 import { useSyncStore } from '../store/sync';
@@ -33,12 +33,13 @@ export function Layout() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showMenu]);
 
+  const navigate = useNavigate();
   const loggingOut = useRef(false);
   const handleLogout = async () => {
     if (loggingOut.current) return;
     loggingOut.current = true;
     await logout();
-    window.location.href = '/login';
+    navigate('/login', { replace: true });
   };
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>

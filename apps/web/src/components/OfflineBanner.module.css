@@ -6,3 +6,19 @@
   font-size: 13px;
   font-weight: 500;
 }
+
+.error {
+  background: var(--color-danger, #e74c3c);
+  color: #fff;
+}
+
+.retryButton {
+  background: transparent;
+  border: 1px solid currentColor;
+  color: inherit;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  margin-left: 6px;
+}

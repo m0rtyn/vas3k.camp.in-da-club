@@ -1,20 +1,23 @@
 import { create } from 'zustand';
 import { getPendingCount } from '../lib/db';
-import { initSync, onSyncChange } from '../lib/sync';
+import { initSync, onSyncChange, syncToServer } from '../lib/sync';
 
 interface SyncState {
   pendingCount: number;
   isOnline: boolean;
   isSyncing: boolean;
+  lastSyncError: string | null;
 
   init: () => () => void;
   refreshPendingCount: () => Promise<void>;
+  retrySync: () => Promise<void>;
 }
 
 export const useSyncStore = create<SyncState>((set) => ({
   pendingCount: 0,
   isOnline: navigator.onLine,
   isSyncing: false,
+  lastSyncError: null,
 
   init: () => {
     const handleOnline = () => set({ isOnline: true });
@@ -24,9 +27,9 @@ export const useSyncStore = create<SyncState>((set) => ({
     window.addEventListener('offline', handleOffline);
 
     const cleanupSync = initSync();
-    const cleanupListener = onSyncChange(async () => {
+    const cleanupListener = onSyncChange(async (error) => {
       const count = await getPendingCount();
-      set({ pendingCount: count });
+      set({ pendingCount: count, lastSyncError: error });
     });
 
     // Initial pending count
@@ -43,5 +46,10 @@ export const useSyncStore = create<SyncState>((set) => ({
   refreshPendingCount: async () => {
     const count = await getPendingCount();
     set({ pendingCount: count });
+  },
+
+  retrySync: async () => {
+    set({ lastSyncError: null });
+    await syncToServer();
   },
 }));

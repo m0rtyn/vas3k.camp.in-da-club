@@ -7,6 +7,7 @@ import {
   addToSyncQueue,
   deleteMeeting as deleteFromDB,
 } from '../lib/db';
+import { useAuthStore } from './auth';
 import type { Meeting } from '@vklube/shared';
 
 interface MeetingsState {
@@ -144,9 +145,12 @@ export const useMeetingsStore = create<MeetingsState>((set, get) => ({
     }
 
     // Update local state
+    const currentUser = useAuthStore.getState().user?.username;
     set({
       meetings: get().meetings.map((m) =>
-        m.id === meetingId ? { ...m, hidden_by: [...m.hidden_by, 'self'] } : m,
+        m.id === meetingId && currentUser
+          ? { ...m, hidden_by: [...m.hidden_by, currentUser] }
+          : m,
       ),
     });
   },
@@ -167,9 +171,12 @@ export const useMeetingsStore = create<MeetingsState>((set, get) => ({
       });
     }
 
+    const currentUser = useAuthStore.getState().user?.username;
     set({
       meetings: get().meetings.map((m) =>
-        m.id === meetingId ? { ...m, hidden_by: [] } : m,
+        m.id === meetingId && currentUser
+          ? { ...m, hidden_by: m.hidden_by.filter((u) => u !== currentUser) }
+          : m,
       ),
     });
   },

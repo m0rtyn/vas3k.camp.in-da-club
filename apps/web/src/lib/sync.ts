@@ -11,17 +11,20 @@ interface SyncResult {
 }
 
 let isSyncing = false;
-let syncListeners: Array<() => void> = [];
+let syncListeners: Array<(error: string | null) => void> = [];
+let backoffMs = 30_000;
+const MIN_BACKOFF = 30_000;
+const MAX_BACKOFF = 5 * 60_000;
 
-export function onSyncChange(listener: () => void): () => void {
+export function onSyncChange(listener: (error: string | null) => void): () => void {
   syncListeners.push(listener);
   return () => {
     syncListeners = syncListeners.filter((l) => l !== listener);
   };
 }
 
-function notifyListeners() {
-  syncListeners.forEach((l) => l());
+function notifyListeners(error: string | null) {
+  syncListeners.forEach((l) => l(error));
 }
 
 /**
@@ -31,6 +34,8 @@ function notifyListeners() {
 export async function syncToServer(): Promise<void> {
   if (isSyncing || !navigator.onLine) return;
   isSyncing = true;
+
+  let syncError: string | null = null;
 
   try {
     const pending = await getPendingSyncItems();
@@ -50,38 +55,52 @@ export async function syncToServer(): Promise<void> {
         await markSynced(pending[result.index].id!);
       }
     }
-  } catch {
-    // Network error — will retry on next sync
+
+    // Reset backoff on success
+    backoffMs = MIN_BACKOFF;
+  } catch (err) {
+    syncError = err instanceof Error ? err.message : 'Sync failed';
+    console.error('Sync failed:', err);
+    // Increase backoff on failure
+    backoffMs = Math.min(backoffMs * 2, MAX_BACKOFF);
   } finally {
     isSyncing = false;
-    notifyListeners();
+    notifyListeners(syncError);
   }
 }
 
 /**
- * Initialize sync engine — listen for online events and poll periodically.
+ * Initialize sync engine — listen for online events and poll with backoff.
  */
 export function initSync(): () => void {
   const handleOnline = () => {
+    backoffMs = MIN_BACKOFF; // Reset backoff when coming online
     syncToServer();
   };
 
   window.addEventListener('online', handleOnline);
 
-  // Poll every 30 seconds when app is open and online
-  const interval = setInterval(() => {
-    if (navigator.onLine) {
-      syncToServer();
-    }
-  }, 30_000);
+  let timeoutId: ReturnType<typeof setTimeout>;
+
+  function scheduleNext() {
+    timeoutId = setTimeout(() => {
+      if (navigator.onLine) {
+        syncToServer().finally(scheduleNext);
+      } else {
+        scheduleNext();
+      }
+    }, backoffMs);
+  }
 
   // Trigger initial sync
   if (navigator.onLine) {
-    syncToServer();
+    syncToServer().finally(scheduleNext);
+  } else {
+    scheduleNext();
   }
 
   return () => {
     window.removeEventListener('online', handleOnline);
-    clearInterval(interval);
+    clearTimeout(timeoutId);
   };
 }

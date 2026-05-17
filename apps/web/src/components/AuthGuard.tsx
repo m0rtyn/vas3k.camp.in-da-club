@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/auth';
-import { redirectToLogin } from '../lib/auth';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -8,12 +8,14 @@ interface AuthGuardProps {
 
 export function AuthGuard({ children }: AuthGuardProps) {
   const { isAuthenticated, isLoading } = useAuthStore();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      redirectToLogin();
+      navigate('/login', { state: { returnTo: location.pathname }, replace: true });
     }
-  }, [isLoading, isAuthenticated]);
+  }, [isLoading, isAuthenticated, navigate, location.pathname]);
 
   if (isLoading) {
     return <p>Загрузка...</p>;

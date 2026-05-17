@@ -28,17 +28,6 @@ export function isAuthenticated(): boolean {
 }
 
 /**
- * Redirect to login page, storing the current path to redirect back after auth.
- */
-export function redirectToLogin(): void {
-  const returnTo = window.location.pathname;
-  if (returnTo !== '/login' && returnTo !== '/callback') {
-    localStorage.setItem('auth_return_to', returnTo);
-  }
-  window.location.href = '/login';
-}
-
-/**
  * Get stored return path after auth callback.
  */
 export function getReturnPath(): string {
