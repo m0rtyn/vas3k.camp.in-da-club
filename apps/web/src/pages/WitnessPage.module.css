@@ -2,9 +2,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: 16px;
-  padding: 60px 20px;
+  padding: 40px 20px;
   text-align: center;
 }
 
@@ -21,4 +20,132 @@
   color: var(--color-text-secondary);
   font-size: 15px;
   line-height: 1.5;
+}
+
+.balance {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  padding: 8px 16px;
+  background: var(--color-surface);
+  border-radius: 8px;
+}
+
+.balanceCount {
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.codeInputs {
+  display: flex;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.digitInput {
+  width: 56px;
+  height: 64px;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  border: 2px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.digitInput:focus {
+  border-color: var(--color-primary);
+}
+
+.submitButton {
+  width: 100%;
+  max-width: 280px;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  background: var(--color-accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.submitButton:active {
+  transform: scale(0.98);
+}
+
+.submitButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error {
+  color: var(--color-error);
+  font-size: 14px;
+}
+
+.success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.successIcon {
+  font-size: 48px;
+}
+
+.successText {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-success);
+}
+
+.noApprovals {
+  color: var(--color-text-secondary);
+  font-size: 15px;
+  max-width: 280px;
+  line-height: 1.5;
+}
+
+.witnessedSection {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 32px;
+  text-align: left;
+}
+
+.witnessedTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: 12px;
+}
+
+.witnessedList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.witnessedItem {
+  padding: 10px 12px;
+  background: var(--color-surface);
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+}
+
+.witnessedPair {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.witnessedDate {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-top: 2px;
 }

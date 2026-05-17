@@ -7,6 +7,7 @@ import {
   timestamp,
   pgEnum,
   uniqueIndex,
+  index,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
@@ -57,15 +58,40 @@ export const meetings = pgTable(
       sql`LEAST(${table.initiator_username}, ${table.target_username})`,
       sql`GREATEST(${table.initiator_username}, ${table.target_username})`,
     ).where(sql`${table.status} != 'cancelled'`),
+    index('idx_meetings_initiator').on(table.initiator_username),
+    index('idx_meetings_target').on(table.target_username),
+    index('idx_meetings_status').on(table.status),
+    index('idx_meetings_created_at').on(sql`${table.created_at} DESC`),
+    index('idx_meetings_witness').on(table.witness_username),
   ],
 );
 
-export const approvalGrants = pgTable('approval_grants', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  granted_by: text('granted_by')
-    .notNull()
-    .references(() => users.username),
-  granted_to: text('granted_to').notNull(), // username or '__all__'
-  amount: integer('amount').notNull(),
-  created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-});
+export const approvalGrants = pgTable(
+  'approval_grants',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    granted_by: text('granted_by')
+      .notNull()
+      .references(() => users.username),
+    granted_to: text('granted_to').notNull(), // username or '__all__'
+    amount: integer('amount').notNull(),
+    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index('idx_approval_grants_granted_to').on(table.granted_to)],
+);
+
+export const sessions = pgTable(
+  'sessions',
+  {
+    id: text('id').primaryKey(),
+    username: text('username')
+      .notNull()
+      .references(() => users.username, { onDelete: 'cascade' }),
+    expires_at: timestamp('expires_at', { withTimezone: true }).notNull(),
+    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('idx_sessions_username').on(table.username),
+    index('idx_sessions_expires_at').on(table.expires_at),
+  ],
+);

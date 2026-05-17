@@ -1,8 +1,9 @@
 import type { Context, Next } from 'hono';
 import { getCookie } from 'hono/cookie';
 import { db } from '../db';
-import { users } from '../schema';
-import { eq } from 'drizzle-orm';
+import { users, sessions } from '../schema';
+import { eq, and, gt } from 'drizzle-orm';
+import { SESSION_COOKIE_NAME } from '../lib/session';
 
 export type AuthUser = {
   username: string;
@@ -17,32 +18,41 @@ export type AuthUser = {
 type Env = {
   Variables: {
     user: AuthUser;
+    sessionId: string;
   };
 };
 
 /**
- * Auth middleware — validates session and attaches user to context.
- * In dev mode (DEV_USER env var set), bypasses OIDC and uses that username.
+ * Auth middleware — validates session cookie against sessions table.
+ * In dev mode with DEV_USER env, falls back to that user (no session record).
  */
 export async function authMiddleware(c: Context<Env>, next: Next) {
-  // Check Bearer token or session cookie
-  const sessionToken = c.req.header('Authorization')?.replace('Bearer ', '')
-    || getCookie(c, 'session');
+  const sessionId = getCookie(c, SESSION_COOKIE_NAME);
 
-  if (sessionToken) {
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.username, sessionToken))
+  if (sessionId) {
+    const [row] = await db
+      .select({
+        username: users.username,
+        display_name: users.display_name,
+        avatar_url: users.avatar_url,
+        bio: users.bio,
+        approvals_available: users.approvals_available,
+        confirmed_contacts_count: users.confirmed_contacts_count,
+        is_admin: users.is_admin,
+      })
+      .from(sessions)
+      .innerJoin(users, eq(users.username, sessions.username))
+      .where(and(eq(sessions.id, sessionId), gt(sessions.expires_at, new Date())))
       .limit(1);
 
-    if (user) {
-      c.set('user', user);
+    if (row) {
+      c.set('user', row);
+      c.set('sessionId', sessionId);
       return next();
     }
   }
 
-  // Fallback: DEV_USER env for auto-login without token (dev only)
+  // Dev-only fallback: DEV_USER env for auto-login without session
   const devUser = process.env.DEV_USER;
   if (devUser && process.env.NODE_ENV !== 'production') {
     const [user] = await db

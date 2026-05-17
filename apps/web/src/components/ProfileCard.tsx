@@ -18,7 +18,14 @@ export function ProfileCard({ username, display_name, avatar_url, bio }: Profile
         </div>
       )}
       <div className={styles.name}>{display_name}</div>
-      <div className={styles.username}>@{username}</div>
+      <a
+        href={`https://vas3k.club/user/${username}/`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={styles.username}
+      >
+        @{username} ↗
+      </a>
       {bio && <div className={styles.bio}>{bio}</div>}
     </div>
   );

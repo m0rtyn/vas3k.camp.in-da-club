@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/auth';
-import { getReturnPath } from '../lib/auth';
+import { getReturnPath, setReturnPath } from '../lib/auth';
 import styles from './LoginPage.module.css';
 
 export function LoginPage() {
@@ -16,7 +16,7 @@ export function LoginPage() {
   // Save returnTo for OIDC callback flow (full page navigation loses router state)
   useEffect(() => {
     if (returnTo) {
-      localStorage.setItem('auth_return_to', returnTo);
+      setReturnPath(returnTo);
     }
   }, [returnTo]);
 

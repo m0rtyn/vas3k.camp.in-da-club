@@ -8,6 +8,13 @@
       "when": 1772476163409,
       "tag": "0000_dear_gauntlet",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1779049504478,
+      "tag": "0001_sessions_and_indexes",
+      "breakpoints": true
     }
   ]
 }

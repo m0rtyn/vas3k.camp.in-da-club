@@ -37,6 +37,12 @@
 .username {
   color: var(--color-text-secondary);
   font-size: 14px;
+  text-decoration: none;
+}
+
+.username:hover {
+  color: var(--color-text);
+  text-decoration: underline;
 }
 
 .bio {

@@ -9,15 +9,18 @@ type Filter = 'all' | 'confirmed' | 'unconfirmed';
 
 export function ContactsPage() {
   const { user } = useAuthStore();
-  const { meetings, fetchMeetings, cancelMeeting, hideMeeting } = useMeetingsStore();
+  const { meetings, fetchMeetings, cancelMeeting } = useMeetingsStore();
   const [filter, setFilter] = useState<Filter>('all');
 
   useEffect(() => {
     fetchMeetings();
   }, [fetchMeetings]);
 
-  const filtered = meetings.filter((m) => {
-    if (m.status === 'cancelled') return false;
+  const visible = meetings.filter(
+    (m) => m.status !== 'cancelled' && !(user && m.hidden_by?.includes(user.username)),
+  );
+
+  const filtered = visible.filter((m) => {
     if (filter === 'confirmed') return m.status === 'confirmed';
     if (filter === 'unconfirmed') return m.status === 'unconfirmed';
     return true;
@@ -35,9 +38,9 @@ export function ContactsPage() {
               className={`${styles.filterButton} ${filter === f ? styles.filterButtonActive : ''}`}
               onClick={() => setFilter(f)}
             >
-              {f === 'all' && `Все (${meetings.length})`}
-              {f === 'confirmed' && `Подтверждённые (${meetings.filter((m) => m.status === 'confirmed').length})`}
-              {f === 'unconfirmed' && `Без подтверждения (${meetings.filter((m) => m.status === 'unconfirmed').length})`}
+              {f === 'all' && `Все (${visible.length})`}
+              {f === 'confirmed' && `Подтверждённые (${visible.filter((m) => m.status === 'confirmed').length})`}
+              {f === 'unconfirmed' && `Без подтверждения (${visible.filter((m) => m.status === 'unconfirmed').length})`}
             </button>
           ))}
         </div>
@@ -56,7 +59,6 @@ export function ContactsPage() {
                 meeting={meeting}
                 currentUsername={user!.username}
                 onCancel={cancelMeeting}
-                onHide={hideMeeting}
               />
             ))}
           </div>

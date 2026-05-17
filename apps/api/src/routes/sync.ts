@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { db } from '../db';
 import { meetings, users } from '../schema';
 import { eq, and, ne, or, sql } from 'drizzle-orm';
-import { CANCEL_WINDOW_MS } from '@vklube/shared';
+import { CANCEL_WINDOW_MS, CONTACTS_PER_APPROVAL } from '@vklube/shared';
 import type { SyncAction } from '@vklube/shared';
 import type { AppEnv } from '../types';
 
@@ -128,37 +128,82 @@ async function processAction(
       return cancelled;
     }
 
-    case 'hide_meeting': {
-      const { meeting_id } = item.payload as { meeting_id: string };
-
-      const [updated] = await db
-        .update(meetings)
-        .set({
-          hidden_by: sql`array_append(${meetings.hidden_by}, ${user.username})`,
-        })
-        .where(eq(meetings.id, meeting_id))
-        .returning();
-
-      return updated;
-    }
-
+    case 'hide_meeting':
     case 'unhide_meeting': {
-      const { meeting_id } = item.payload as { meeting_id: string };
-
-      const [updated] = await db
-        .update(meetings)
-        .set({
-          hidden_by: sql`array_remove(${meetings.hidden_by}, ${user.username})`,
-        })
-        .where(eq(meetings.id, meeting_id))
-        .returning();
-
-      return updated;
+      // Hide/unhide functionality removed — silently skip legacy queue items
+      return { skipped: true };
     }
 
     case 'witness_meeting': {
-      // Phase 2 — skip silently, don't break the batch
-      return { skipped: true, reason: 'Witness mechanic not yet implemented' };
+      const { witness_code } = item.payload as { witness_code: string };
+
+      if (!witness_code || witness_code.length !== 4) {
+        throw new Error('Valid 4-digit witness_code is required');
+      }
+
+      return await db.transaction(async (tx) => {
+        const [meeting] = await tx
+          .select()
+          .from(meetings)
+          .where(
+            and(
+              eq(meetings.status, 'pending'),
+              eq(meetings.witness_code, witness_code),
+              sql`${meetings.witness_code_expires_at} + interval '1 minute' >= NOW()`,
+            ),
+          )
+          .for('update')
+          .limit(1);
+
+        if (!meeting) throw new Error('No active meeting found with this code');
+
+        if (user.username === meeting.initiator_username || user.username === meeting.target_username) {
+          throw new Error('Cannot witness your own meeting');
+        }
+
+        const [witnessUser] = await tx
+          .select({ approvals_available: users.approvals_available })
+          .from(users)
+          .where(eq(users.username, user.username))
+          .for('update')
+          .limit(1);
+
+        if (!witnessUser || witnessUser.approvals_available < 1) {
+          throw new Error('No available approvals');
+        }
+
+        const [confirmed] = await tx
+          .update(meetings)
+          .set({
+            status: 'confirmed',
+            witness_username: user.username,
+            confirmed_at: new Date(),
+          })
+          .where(eq(meetings.id, meeting.id))
+          .returning();
+
+        await tx
+          .update(users)
+          .set({ approvals_available: sql`${users.approvals_available} - 1` })
+          .where(eq(users.username, user.username));
+
+        for (const username of [meeting.initiator_username, meeting.target_username]) {
+          const [participant] = await tx
+            .update(users)
+            .set({ confirmed_contacts_count: sql`${users.confirmed_contacts_count} + 1` })
+            .where(eq(users.username, username))
+            .returning({ count: users.confirmed_contacts_count });
+
+          if (participant && participant.count % CONTACTS_PER_APPROVAL === 0) {
+            await tx
+              .update(users)
+              .set({ approvals_available: sql`${users.approvals_available} + 1` })
+              .where(eq(users.username, username));
+          }
+        }
+
+        return confirmed;
+      });
     }
 
     default:

@@ -6,13 +6,11 @@ async function request<T>(
   path: string,
   options: RequestInit = {},
 ): Promise<T> {
-  const token = localStorage.getItem('auth_token');
-
   const res = await fetch(`${BASE_URL}${path}`, {
+    credentials: 'same-origin',
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
   });

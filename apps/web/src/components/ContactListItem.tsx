@@ -5,14 +5,12 @@ import styles from './ContactListItem.module.css';
 interface ContactListItemProps {
   meeting: Meeting;
   currentUsername: string;
-  onHide?: (meetingId: string) => void;
   onCancel?: (meetingId: string) => void;
 }
 
 export function ContactListItem({
   meeting,
   currentUsername,
-  onHide,
   onCancel,
 }: ContactListItemProps) {
   const otherUsername =
@@ -45,6 +43,11 @@ export function ContactListItem({
             {isConfirmed ? '✓ подтверждено' : 'не подтверждено'}
           </span>
         </div>
+        {isConfirmed && meeting.witness_username && (
+          <div className={styles.witness}>
+            свидетель: @{meeting.witness_username}
+          </div>
+        )}
       </Link>
 
       <div className={styles.actions}>
@@ -55,15 +58,6 @@ export function ContactListItem({
             title="Отменить"
           >
             ✕
-          </button>
-        )}
-        {!canCancel && onHide && (
-          <button
-            className={styles.actionButton}
-            onClick={() => onHide(meeting.id)}
-            title="Скрыть"
-          >
-            👁‍🗨
           </button>
         )}
       </div>

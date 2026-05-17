@@ -7,7 +7,7 @@ import styles from './DashboardPage.module.css';
 
 export function DashboardPage() {
   const { user, isAuthenticated } = useAuthStore();
-  const { meetings, isLoading, fetchMeetings, cancelMeeting, hideMeeting } = useMeetingsStore();
+  const { meetings, isLoading, fetchMeetings, cancelMeeting } = useMeetingsStore();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -31,9 +31,12 @@ export function DashboardPage() {
     );
   }
 
-  const confirmedCount = meetings.filter((m) => m.status === 'confirmed').length;
-  const totalCount = meetings.length;
-  const recentMeetings = meetings.slice(0, 5);
+  const visibleMeetings = meetings.filter(
+    (m) => m.status !== 'cancelled' && !m.hidden_by?.includes(user.username),
+  );
+  const confirmedCount = visibleMeetings.filter((m) => m.status === 'confirmed').length;
+  const totalCount = visibleMeetings.length;
+  const recentMeetings = visibleMeetings.slice(0, 5);
 
   return (
     <div className={styles.page}>
@@ -71,11 +74,10 @@ export function DashboardPage() {
               meeting={meeting}
               currentUsername={user.username}
               onCancel={cancelMeeting}
-              onHide={hideMeeting}
             />
           ))
         )}
-        {meetings.length > 5 && (
+        {visibleMeetings.length > 5 && (
           <Link to="/contacts" style={{ textAlign: 'center', fontSize: 14 }}>
             Все контакты →
           </Link>

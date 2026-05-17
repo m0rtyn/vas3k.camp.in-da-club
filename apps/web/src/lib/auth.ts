@@ -1,37 +1,24 @@
 /**
- * Auth configuration for OIDC with vas3k.club.
- *
- * In dev mode, uses DEV_USER-based auth:
- * - Call POST /api/auth/dev-login with { username } to get a session
- * - Store the username as auth_token in localStorage
- *
- * In production, will use proper OIDC flow:
- * - Redirect to vas3k.club OIDC authorize endpoint
- * - Handle callback with authorization code
- * - Exchange code for tokens server-side
+ * Auth helpers — session is stored in httpOnly cookie set by the server.
+ * Client cannot read it; rely on /api/auth/me to know who's logged in.
  */
 
-export function getAuthToken(): string | null {
-  return localStorage.getItem('auth_token');
+const RETURN_PATH_KEY = 'auth_return_to';
+
+export function setReturnPath(path: string): void {
+  try {
+    sessionStorage.setItem(RETURN_PATH_KEY, path);
+  } catch {
+    /* ignore */
+  }
 }
 
-export function setAuthToken(token: string): void {
-  localStorage.setItem('auth_token', token);
-}
-
-export function clearAuthToken(): void {
-  localStorage.removeItem('auth_token');
-}
-
-export function isAuthenticated(): boolean {
-  return !!getAuthToken();
-}
-
-/**
- * Get stored return path after auth callback.
- */
 export function getReturnPath(): string {
-  const path = localStorage.getItem('auth_return_to');
-  localStorage.removeItem('auth_return_to');
-  return path || '/';
+  try {
+    const path = sessionStorage.getItem(RETURN_PATH_KEY);
+    sessionStorage.removeItem(RETURN_PATH_KEY);
+    return path || '/';
+  } catch {
+    return '/';
+  }
 }

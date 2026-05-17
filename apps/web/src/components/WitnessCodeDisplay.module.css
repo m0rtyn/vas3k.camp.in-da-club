@@ -1,0 +1,62 @@
+.container {
+  text-align: center;
+  padding: 16px;
+  background: var(--color-surface);
+  border-radius: 12px;
+  border: 2px dashed var(--color-border);
+}
+
+.label {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-bottom: 8px;
+}
+
+.code {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: 8px;
+  color: var(--color-text);
+  margin: 8px 0;
+}
+
+.timer {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+}
+
+.timerExpiring {
+  color: var(--color-error);
+  font-weight: 600;
+}
+
+.expired {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.refreshButton {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 8px 16px;
+  font-size: 14px;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.refreshButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-top: 12px;
+}

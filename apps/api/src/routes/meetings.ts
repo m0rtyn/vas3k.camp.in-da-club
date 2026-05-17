@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { db } from '../db';
 import { meetings, users } from '../schema';
 import { eq, or, and, ne, sql, desc } from 'drizzle-orm';
-import { CANCEL_WINDOW_MS } from '@vklube/shared';
+import { CANCEL_WINDOW_MS, WITNESS_CODE_DURATION_MS, WITNESS_CODE_LENGTH, CONTACTS_PER_APPROVAL } from '@vklube/shared';
 import type { AppEnv } from '../types';
 
 const meetingsRouter = new Hono<AppEnv>();
@@ -117,6 +117,54 @@ meetingsRouter.get('/', async (c) => {
 });
 
 /**
+ * GET /api/meetings/witnessed — List meetings where current user was the witness
+ */
+meetingsRouter.get('/witnessed', async (c) => {
+  const user = c.get('user');
+
+  const result = await db
+    .select()
+    .from(meetings)
+    .where(
+      and(
+        eq(meetings.witness_username, user.username),
+        eq(meetings.status, 'confirmed'),
+      ),
+    )
+    .orderBy(desc(meetings.confirmed_at));
+
+  return c.json(result);
+});
+
+/**
+ * GET /api/meetings/:id — Fetch a single meeting (must be participant or witness)
+ */
+meetingsRouter.get('/:id', async (c) => {
+  const user = c.get('user');
+  const meetingId = c.req.param('id');
+
+  const [meeting] = await db
+    .select()
+    .from(meetings)
+    .where(eq(meetings.id, meetingId))
+    .limit(1);
+
+  if (!meeting) {
+    return c.json({ error: 'not_found', message: 'Meeting not found' }, 404);
+  }
+
+  if (
+    meeting.initiator_username !== user.username &&
+    meeting.target_username !== user.username &&
+    meeting.witness_username !== user.username
+  ) {
+    return c.json({ error: 'forbidden', message: 'Not a participant of this meeting' }, 403);
+  }
+
+  return c.json(meeting);
+});
+
+/**
  * POST /api/meetings/:id/cancel — Cancel a meeting (hard delete within 5 min)
  */
 meetingsRouter.post('/:id/cancel', async (c) => {
@@ -143,7 +191,7 @@ meetingsRouter.post('/:id/cancel', async (c) => {
   if (elapsed > CANCEL_WINDOW_MS) {
     return c.json({
       error: 'bad_request',
-      message: 'Cancel window has expired. You can hide this meeting instead.',
+      message: 'Cancel window has expired.',
     }, 400);
   }
 
@@ -161,9 +209,9 @@ meetingsRouter.post('/:id/cancel', async (c) => {
 });
 
 /**
- * POST /api/meetings/:id/hide — Hide meeting from current user's list
+ * POST /api/meetings/:id/request-witness — Generate a 4-digit witness code
  */
-meetingsRouter.post('/:id/hide', async (c) => {
+meetingsRouter.post('/:id/request-witness', async (c) => {
   const user = c.get('user');
   const meetingId = c.req.param('id');
 
@@ -177,50 +225,34 @@ meetingsRouter.post('/:id/hide', async (c) => {
     return c.json({ error: 'not_found', message: 'Meeting not found' }, 404);
   }
 
+  // Must be participant
   if (meeting.initiator_username !== user.username && meeting.target_username !== user.username) {
     return c.json({ error: 'forbidden', message: 'Not a participant of this meeting' }, 403);
   }
 
-  if (meeting.hidden_by.includes(user.username)) {
-    return c.json(meeting); // Already hidden, no-op
+  // Must be unconfirmed or pending (allow re-requesting if code expired)
+  if (meeting.status !== 'unconfirmed' && meeting.status !== 'pending') {
+    return c.json({ error: 'bad_request', message: 'Meeting cannot be witnessed in its current state' }, 400);
   }
+
+  // If already has active (non-expired) code, return it
+  if (meeting.witness_code && meeting.witness_code_expires_at) {
+    const expiresAt = new Date(meeting.witness_code_expires_at).getTime();
+    if (expiresAt > Date.now()) {
+      return c.json(meeting);
+    }
+  }
+
+  // Generate new 4-digit code
+  const code = String(Math.floor(Math.random() * 10 ** WITNESS_CODE_LENGTH)).padStart(WITNESS_CODE_LENGTH, '0');
+  const expiresAt = new Date(Date.now() + WITNESS_CODE_DURATION_MS);
 
   const [updated] = await db
     .update(meetings)
     .set({
-      hidden_by: sql`array_append(${meetings.hidden_by}, ${user.username})`,
-    })
-    .where(eq(meetings.id, meetingId))
-    .returning();
-
-  return c.json(updated);
-});
-
-/**
- * POST /api/meetings/:id/unhide — Unhide meeting from current user's list
- */
-meetingsRouter.post('/:id/unhide', async (c) => {
-  const user = c.get('user');
-  const meetingId = c.req.param('id');
-
-  const [meeting] = await db
-    .select()
-    .from(meetings)
-    .where(eq(meetings.id, meetingId))
-    .limit(1);
-
-  if (!meeting) {
-    return c.json({ error: 'not_found', message: 'Meeting not found' }, 404);
-  }
-
-  if (meeting.initiator_username !== user.username && meeting.target_username !== user.username) {
-    return c.json({ error: 'forbidden', message: 'Not a participant of this meeting' }, 403);
-  }
-
-  const [updated] = await db
-    .update(meetings)
-    .set({
-      hidden_by: sql`array_remove(${meetings.hidden_by}, ${user.username})`,
+      witness_code: code,
+      witness_code_expires_at: expiresAt,
+      status: 'pending',
     })
     .where(eq(meetings.id, meetingId))
     .returning();

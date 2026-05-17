@@ -112,3 +112,12 @@ export async function getPendingCount(): Promise<number> {
   const items = await getPendingSyncItems();
   return items.length;
 }
+
+export async function clearAllLocalData(): Promise<void> {
+  const db = await getDB();
+  await Promise.all([
+    db.clear('meetings'),
+    db.clear('users'),
+    db.clear('syncQueue'),
+  ]);
+}

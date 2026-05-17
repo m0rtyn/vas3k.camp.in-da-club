@@ -21,16 +21,17 @@ self.addEventListener('message', (event) => {
 // Precache all static assets (injected by vite-plugin-pwa)
 precacheAndRoute(self.__WB_MANIFEST);
 
-// API calls: network-first with expiration
+// API calls: network-first with expiration.
+// Auth endpoints are excluded to avoid serving stale identity after logout/login switch.
 registerRoute(
-  ({ url }) => url.pathname.startsWith('/api/'),
+  ({ url }) => url.pathname.startsWith('/api/') && !url.pathname.startsWith('/api/auth/'),
   new NetworkFirst({
     cacheName: 'api-cache',
     networkTimeoutSeconds: 5,
     plugins: [
       new ExpirationPlugin({
         maxEntries: 50,
-        maxAgeSeconds: 24 * 60 * 60, // 24 hours
+        maxAgeSeconds: 60 * 60, // 1 hour
       }),
     ],
   }),

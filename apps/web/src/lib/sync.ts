@@ -49,10 +49,18 @@ export async function syncToServer(): Promise<void> {
 
     const { results } = await api.post<{ results: SyncResult[] }>('/sync', { items });
 
-    // Mark successful items as synced
+    // Mark each replayed item as synced, regardless of success.
+    // - success=true → server applied the action (or it was idempotent no-op)
+    // - success=false → permanent client-side problem (expired code, conflict, etc.).
+    //   Keeping it in the queue would cause infinite retries.
+    // Server/network failures throw and skip this whole branch (item stays pending).
     for (const result of results) {
-      if (result.success && pending[result.index].id !== undefined) {
-        await markSynced(pending[result.index].id!);
+      const queueItem = pending[result.index];
+      if (queueItem?.id !== undefined) {
+        if (!result.success) {
+          console.warn('Sync item permanently failed:', result.action, result.error);
+        }
+        await markSynced(queueItem.id);
       }
     }
 

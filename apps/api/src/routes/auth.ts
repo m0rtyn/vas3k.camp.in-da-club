@@ -1,9 +1,10 @@
 import { Hono } from 'hono';
-import { setCookie, deleteCookie } from 'hono/cookie';
+import { setCookie, deleteCookie, getCookie } from 'hono/cookie';
 import { db } from '../db';
 import { users } from '../schema';
 import { eq } from 'drizzle-orm';
 import type { AppEnv } from '../types';
+import { createSession, deleteSession, SESSION_COOKIE_NAME, sessionCookieOptions } from '../lib/session';
 
 const auth = new Hono<AppEnv>();
 
@@ -60,12 +61,11 @@ auth.get('/callback', async (c) => {
   });
 
   if (!tokenRes.ok) {
-    console.error('OIDC token exchange failed:', tokenRes.status, await tokenRes.text());
+    console.error('OIDC token exchange failed:', tokenRes.status);
     return c.json({ error: 'auth_failed', message: 'Failed to exchange authorization code' }, 502);
   }
 
   const tokenData = await tokenRes.json() as { access_token: string; token_type: string };
-  console.log('OIDC token response:', JSON.stringify(tokenData));
 
   // 2. Fetch user profile from vas3k.club API
   const profileRes = await fetch(`${issuer}/user/me.json`, {
@@ -73,14 +73,13 @@ auth.get('/callback', async (c) => {
   });
 
   if (!profileRes.ok) {
-    console.error('OIDC profile fetch failed:', profileRes.status, await profileRes.text());
+    console.error('OIDC profile fetch failed:', profileRes.status);
     return c.json({ error: 'auth_failed', message: 'Failed to fetch user profile' }, 502);
   }
 
   const profileData = await profileRes.json() as {
     user: { slug: string; full_name: string; avatar: string; bio: string };
   };
-  console.log('OIDC profile response:', JSON.stringify(profileData));
 
   const { slug, full_name, avatar, bio } = profileData.user;
 
@@ -102,18 +101,13 @@ auth.get('/callback', async (c) => {
       },
     });
 
-  // 4. Set session cookie
-  setCookie(c, 'session', slug, {
-    httpOnly: true,
-    secure: isProduction,
-    sameSite: 'Lax',
-    path: '/',
-    maxAge: 60 * 60 * 24 * 7, // 7 days
-  });
+  // 4. Create session and set httpOnly cookie
+  const session = await createSession(slug);
+  setCookie(c, SESSION_COOKIE_NAME, session.id, sessionCookieOptions(isProduction));
 
-  // Redirect to frontend callback page with token for localStorage
+  // Redirect to frontend callback (no token in URL)
   const frontendOrigin = isProduction ? '' : (process.env.FRONTEND_URL || '');
-  return c.redirect(`${frontendOrigin}/callback?token=${encodeURIComponent(slug)}`);
+  return c.redirect(`${frontendOrigin}/callback`);
 });
 
 /**
@@ -130,8 +124,12 @@ auth.get('/me', async (c) => {
 /**
  * POST /api/auth/logout — End session
  */
-auth.post('/logout', (c) => {
-  deleteCookie(c, 'session', { path: '/' });
+auth.post('/logout', async (c) => {
+  const sessionId = getCookie(c, SESSION_COOKIE_NAME);
+  if (sessionId) {
+    await deleteSession(sessionId);
+  }
+  deleteCookie(c, SESSION_COOKIE_NAME, { path: '/' });
   return c.json({ ok: true });
 });
 
@@ -169,7 +167,9 @@ auth.post('/dev-login', async (c) => {
     })
     .returning();
 
-  // In dev mode, the username acts as the session token
+  const session = await createSession(username);
+  setCookie(c, SESSION_COOKIE_NAME, session.id, sessionCookieOptions(false));
+
   return c.json(user);
 });
 

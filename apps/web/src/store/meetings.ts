@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { api } from '../lib/api';
-import { getAuthToken } from '../lib/auth';
 import {
   saveMeeting,
   getAllMeetings,
@@ -15,10 +14,11 @@ interface MeetingsState {
   isLoading: boolean;
 
   fetchMeetings: () => Promise<void>;
+  refreshMeeting: (meetingId: string) => Promise<Meeting | null>;
   createMeeting: (targetUsername: string) => Promise<Meeting>;
+  requestWitnessCode: (meetingId: string) => Promise<Meeting>;
+  confirmAsWitness: (witnessCode: string) => Promise<Meeting>;
   cancelMeeting: (meetingId: string) => Promise<void>;
-  hideMeeting: (meetingId: string) => Promise<void>;
-  unhideMeeting: (meetingId: string) => Promise<void>;
   getMeetingWithUser: (username: string) => Meeting | undefined;
 }
 
@@ -28,16 +28,13 @@ export const useMeetingsStore = create<MeetingsState>((set, get) => ({
 
   fetchMeetings: async () => {
     try {
-      // Try fetching from server first
       if (navigator.onLine) {
         const meetings = await api.get<Meeting[]>('/meetings');
-        // Cache in IndexedDB
         for (const meeting of meetings) {
           await saveMeeting(meeting);
         }
         set({ meetings, isLoading: false });
       } else {
-        // Offline: read from IndexedDB
         const meetings = await getAllMeetings();
         set({
           meetings: meetings.filter((m) => m.status !== 'cancelled'),
@@ -45,7 +42,6 @@ export const useMeetingsStore = create<MeetingsState>((set, get) => ({
         });
       }
     } catch {
-      // Fallback to IndexedDB
       const meetings = await getAllMeetings();
       set({
         meetings: meetings.filter((m) => m.status !== 'cancelled'),
@@ -54,10 +50,24 @@ export const useMeetingsStore = create<MeetingsState>((set, get) => ({
     }
   },
 
+  refreshMeeting: async (meetingId: string) => {
+    if (!navigator.onLine) return null;
+    try {
+      const meeting = await api.get<Meeting>(`/meetings/${meetingId}`);
+      await saveMeeting(meeting);
+      set({
+        meetings: get().meetings.map((m) => (m.id === meetingId ? meeting : m)),
+      });
+      return meeting;
+    } catch {
+      return null;
+    }
+  },
+
   createMeeting: async (targetUsername: string) => {
     const now = new Date().toISOString();
 
-    const initiator = getAuthToken();
+    const initiator = useAuthStore.getState().user?.username;
     if (!initiator) {
       throw new Error('Not authenticated');
     }
@@ -79,17 +89,13 @@ export const useMeetingsStore = create<MeetingsState>((set, get) => ({
     };
 
     if (navigator.onLine) {
-      try {
-        const meeting = await api.post<Meeting>('/meetings', {
-          target_username: targetUsername,
-          client_created_at: now,
-        });
-        await saveMeeting(meeting);
-        set({ meetings: [meeting, ...get().meetings] });
-        return meeting;
-      } catch (err) {
-        throw err;
-      }
+      const meeting = await api.post<Meeting>('/meetings', {
+        target_username: targetUsername,
+        client_created_at: now,
+      });
+      await saveMeeting(meeting);
+      set({ meetings: [meeting, ...get().meetings] });
+      return meeting;
     }
 
     // Offline: save locally + queue sync
@@ -108,13 +114,32 @@ export const useMeetingsStore = create<MeetingsState>((set, get) => ({
     return localMeeting;
   },
 
+  requestWitnessCode: async (meetingId: string) => {
+    const meeting = await api.post<Meeting>(`/meetings/${meetingId}/request-witness`);
+    await saveMeeting(meeting);
+    set({
+      meetings: get().meetings.map((m) => (m.id === meetingId ? meeting : m)),
+    });
+    return meeting;
+  },
+
+  confirmAsWitness: async (witnessCode: string) => {
+    const meeting = await api.post<Meeting>('/witness/confirm', { witness_code: witnessCode });
+    const authState = useAuthStore.getState();
+    if (authState.user) {
+      useAuthStore.setState({
+        user: {
+          ...authState.user,
+          approvals_available: authState.user.approvals_available - 1,
+        },
+      });
+    }
+    return meeting;
+  },
+
   cancelMeeting: async (meetingId: string) => {
     if (navigator.onLine) {
-      try {
-        await api.post(`/meetings/${meetingId}/cancel`);
-      } catch (err) {
-        throw err;
-      }
+      await api.post(`/meetings/${meetingId}/cancel`);
     } else {
       await addToSyncQueue({
         action: 'cancel_meeting',
@@ -126,59 +151,6 @@ export const useMeetingsStore = create<MeetingsState>((set, get) => ({
 
     await deleteFromDB(meetingId);
     set({ meetings: get().meetings.filter((m) => m.id !== meetingId) });
-  },
-
-  hideMeeting: async (meetingId: string) => {
-    if (navigator.onLine) {
-      try {
-        await api.post(`/meetings/${meetingId}/hide`);
-      } catch (err) {
-        throw err;
-      }
-    } else {
-      await addToSyncQueue({
-        action: 'hide_meeting',
-        payload: { meeting_id: meetingId },
-        created_at: new Date().toISOString(),
-        synced: false,
-      });
-    }
-
-    // Update local state
-    const currentUser = useAuthStore.getState().user?.username;
-    set({
-      meetings: get().meetings.map((m) =>
-        m.id === meetingId && currentUser
-          ? { ...m, hidden_by: [...m.hidden_by, currentUser] }
-          : m,
-      ),
-    });
-  },
-
-  unhideMeeting: async (meetingId: string) => {
-    if (navigator.onLine) {
-      try {
-        await api.post(`/meetings/${meetingId}/unhide`);
-      } catch (err) {
-        throw err;
-      }
-    } else {
-      await addToSyncQueue({
-        action: 'unhide_meeting',
-        payload: { meeting_id: meetingId },
-        created_at: new Date().toISOString(),
-        synced: false,
-      });
-    }
-
-    const currentUser = useAuthStore.getState().user?.username;
-    set({
-      meetings: get().meetings.map((m) =>
-        m.id === meetingId && currentUser
-          ? { ...m, hidden_by: m.hidden_by.filter((u) => u !== currentUser) }
-          : m,
-      ),
-    });
   },
 
   getMeetingWithUser: (username: string) => {
