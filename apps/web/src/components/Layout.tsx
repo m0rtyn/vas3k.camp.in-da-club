@@ -1,7 +1,8 @@
-import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { useEffect, useRef } from 'react';
+import { Outlet, NavLink } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
 import { useAuthStore } from '../store/auth';
 import { useSyncStore } from '../store/sync';
+import { usePwaStore } from '../store/pwa';
 import { OfflineBanner } from './OfflineBanner';
 import styles from './Layout.module.css';
 
@@ -16,6 +17,21 @@ export function Layout() {
   useEffect(() => {
     return initSync();
   }, [initSync]);
+
+  const resetServiceWorker = usePwaStore((s) => s.resetServiceWorker);
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!showMenu) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showMenu]);
 
   const loggingOut = useRef(false);
   const handleLogout = async () => {
@@ -44,13 +60,25 @@ export function Layout() {
               />
             )}
             <span>{user.display_name}</span>
-            <button
-              className={styles.logoutButton}
-              onClick={handleLogout}
-              title="Выйти"
-            >
-              ↩
-            </button>
+            <div className={styles.menuWrapper} ref={menuRef}>
+              <button
+                className={styles.menuButton}
+                onClick={() => setShowMenu((v) => !v)}
+                title="Меню"
+              >
+                ⋮
+              </button>
+              {showMenu && (
+                <div className={styles.menu}>
+                  <button className={styles.menuItem} onClick={resetServiceWorker}>
+                    🔄 Сбросить кэш
+                  </button>
+                  <button className={styles.menuItem} onClick={handleLogout}>
+                    ↩ Выйти
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </header>

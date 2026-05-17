@@ -1,5 +1,8 @@
 import { Routes, Route } from 'react-router-dom';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { UpdatePrompt } from './components/UpdatePrompt';
+import { InstallPrompt } from './components/InstallPrompt';
+import { IosInstallHint } from './components/IosInstallHint';
 import { Layout } from './components/Layout';
 import { DashboardPage } from './pages/DashboardPage';
 import { ProfilePage } from './pages/ProfilePage';
@@ -13,6 +16,9 @@ import { CallbackPage } from './pages/CallbackPage';
 export function App() {
   return (
     <ErrorBoundary>
+      <UpdatePrompt />
+      <InstallPrompt />
+      <IosInstallHint />
       <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/callback" element={<CallbackPage />} />

@@ -6,6 +6,8 @@
       "name": "vklube",
       "devDependencies": {
         "drizzle-kit": "^0.30.0",
+        "workbox-cacheable-response": "^7.4.1",
+        "workbox-expiration": "^7.4.1",
       },
     },
     "apps/api": {
@@ -39,9 +41,13 @@
         "typescript": "^5.7.0",
         "vite": "^6.1.0",
         "vite-plugin-pwa": "^0.21.0",
+        "workbox-cacheable-response": "^7.4.1",
+        "workbox-core": "^7.4.1",
+        "workbox-expiration": "^7.4.1",
         "workbox-precaching": "^7.3.0",
         "workbox-routing": "^7.3.0",
         "workbox-strategies": "^7.3.0",
+        "workbox-window": "^7.4.1",
       },
     },
     "packages/shared": {
@@ -868,11 +874,11 @@
 
     "workbox-build": ["workbox-build@7.4.0", "", { "dependencies": { "@apideck/better-ajv-errors": "^0.3.1", "@babel/core": "^7.24.4", "@babel/preset-env": "^7.11.0", "@babel/runtime": "^7.11.2", "@rollup/plugin-babel": "^5.2.0", "@rollup/plugin-node-resolve": "^15.2.3", "@rollup/plugin-replace": "^2.4.1", "@rollup/plugin-terser": "^0.4.3", "@surma/rollup-plugin-off-main-thread": "^2.2.3", "ajv": "^8.6.0", "common-tags": "^1.8.0", "fast-json-stable-stringify": "^2.1.0", "fs-extra": "^9.0.1", "glob": "^11.0.1", "lodash": "^4.17.20", "pretty-bytes": "^5.3.0", "rollup": "^2.79.2", "source-map": "^0.8.0-beta.0", "stringify-object": "^3.3.0", "strip-comments": "^2.0.1", "tempy": "^0.6.0", "upath": "^1.2.0", "workbox-background-sync": "7.4.0", "workbox-broadcast-update": "7.4.0", "workbox-cacheable-response": "7.4.0", "workbox-core": "7.4.0", "workbox-expiration": "7.4.0", "workbox-google-analytics": "7.4.0", "workbox-navigation-preload": "7.4.0", "workbox-precaching": "7.4.0", "workbox-range-requests": "7.4.0", "workbox-recipes": "7.4.0", "workbox-routing": "7.4.0", "workbox-strategies": "7.4.0", "workbox-streams": "7.4.0", "workbox-sw": "7.4.0", "workbox-window": "7.4.0" } }, "sha512-Ntk1pWb0caOFIvwz/hfgrov/OJ45wPEhI5PbTywQcYjyZiVhT3UrwwUPl6TRYbTm4moaFYithYnl1lvZ8UjxcA=="],
 
-    "workbox-cacheable-response": ["workbox-cacheable-response@7.4.0", "", { "dependencies": { "workbox-core": "7.4.0" } }, "sha512-0Fb8795zg/x23ISFkAc7lbWes6vbw34DGFIMw31cwuHPgDEC/5EYm6m/ZkylLX0EnEbbOyOCLjKgFS/Z5g0HeQ=="],
+    "workbox-cacheable-response": ["workbox-cacheable-response@7.4.1", "", { "dependencies": { "workbox-core": "7.4.1" } }, "sha512-8xaFoJdDc2OjrlbbL3gEeBO1WKcMwRqwLRupgqahYXu75yXajPLuwrbXMrIGZuWYXrQwk0xDjOxZ/ujCy/oJYw=="],
 
-    "workbox-core": ["workbox-core@7.4.0", "", {}, "sha512-6BMfd8tYEnN4baG4emG9U0hdXM4gGuDU3ectXuVHnj71vwxTFI7WOpQJC4siTOlVtGqCUtj0ZQNsrvi6kZZTAQ=="],
+    "workbox-core": ["workbox-core@7.4.1", "", {}, "sha512-DT+vu46eh/2vRsSHTY4Xmc32Z1rr9PRlQUXr1Dx30ZuXRWwOsvZgGgcwxcasubQLQmbTNYZjv44LkBAQ4tT5tQ=="],
 
-    "workbox-expiration": ["workbox-expiration@7.4.0", "", { "dependencies": { "idb": "^7.0.1", "workbox-core": "7.4.0" } }, "sha512-V50p4BxYhtA80eOvulu8xVfPBgZbkxJ1Jr8UUn0rvqjGhLDqKNtfrDfjJKnLz2U8fO2xGQJTx/SKXNTzHOjnHw=="],
+    "workbox-expiration": ["workbox-expiration@7.4.1", "", { "dependencies": { "idb": "^7.0.1", "workbox-core": "7.4.1" } }, "sha512-lRKUF7b+OGbeXkQk1s6MHXOa3d7Xxf7Of31W6c6hCfipfIyrtdWZ89stq21AHZMaoG7VNFoHply4Ox+rU31TWg=="],
 
     "workbox-google-analytics": ["workbox-google-analytics@7.4.0", "", { "dependencies": { "workbox-background-sync": "7.4.0", "workbox-core": "7.4.0", "workbox-routing": "7.4.0", "workbox-strategies": "7.4.0" } }, "sha512-MVPXQslRF6YHkzGoFw1A4GIB8GrKym/A5+jYDUSL+AeJw4ytQGrozYdiZqUW1TPQHW8isBCBtyFJergUXyNoWQ=="],
 
@@ -892,7 +898,7 @@
 
     "workbox-sw": ["workbox-sw@7.4.0", "", {}, "sha512-ltU+Kr3qWR6BtbdlMnCjobZKzeV1hN+S6UvDywBrwM19TTyqA03X66dzw1tEIdJvQ4lYKkBFox6IAEhoSEZ8Xw=="],
 
-    "workbox-window": ["workbox-window@7.4.0", "", { "dependencies": { "@types/trusted-types": "^2.0.2", "workbox-core": "7.4.0" } }, "sha512-/bIYdBLAVsNR3v7gYGaV4pQW3M3kEPx5E8vDxGvxo6khTrGtSSCS7QiFKv9ogzBgZiy0OXLP9zO28U/1nF1mfw=="],
+    "workbox-window": ["workbox-window@7.4.1", "", { "dependencies": { "@types/trusted-types": "^2.0.2", "workbox-core": "7.4.1" } }, "sha512-notZDH2u8VXaqyuD7xaqIfEFi6SRM4SUSd7ewe9PDsVqADuepxX2ZMY3uvuZGxzY5ZOsGC/vD3A/3smFtJt4/A=="],
 
     "yallist": ["yallist@3.1.1", "", {}, "sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g=="],
 
@@ -934,13 +940,47 @@
 
     "vite/esbuild": ["esbuild@0.25.12", "", { "optionalDependencies": { "@esbuild/aix-ppc64": "0.25.12", "@esbuild/android-arm": "0.25.12", "@esbuild/android-arm64": "0.25.12", "@esbuild/android-x64": "0.25.12", "@esbuild/darwin-arm64": "0.25.12", "@esbuild/darwin-x64": "0.25.12", "@esbuild/freebsd-arm64": "0.25.12", "@esbuild/freebsd-x64": "0.25.12", "@esbuild/linux-arm": "0.25.12", "@esbuild/linux-arm64": "0.25.12", "@esbuild/linux-ia32": "0.25.12", "@esbuild/linux-loong64": "0.25.12", "@esbuild/linux-mips64el": "0.25.12", "@esbuild/linux-ppc64": "0.25.12", "@esbuild/linux-riscv64": "0.25.12", "@esbuild/linux-s390x": "0.25.12", "@esbuild/linux-x64": "0.25.12", "@esbuild/netbsd-arm64": "0.25.12", "@esbuild/netbsd-x64": "0.25.12", "@esbuild/openbsd-arm64": "0.25.12", "@esbuild/openbsd-x64": "0.25.12", "@esbuild/openharmony-arm64": "0.25.12", "@esbuild/sunos-x64": "0.25.12", "@esbuild/win32-arm64": "0.25.12", "@esbuild/win32-ia32": "0.25.12", "@esbuild/win32-x64": "0.25.12" }, "bin": { "esbuild": "bin/esbuild" } }, "sha512-bbPBYYrtZbkt6Os6FiTLCTFxvq4tt3JKall1vRwshA3fdVztsLAatFaZobhkBC8/BrPetoa0oksYoKXoG4ryJg=="],
 
+    "vite-plugin-pwa/workbox-window": ["workbox-window@7.4.0", "", { "dependencies": { "@types/trusted-types": "^2.0.2", "workbox-core": "7.4.0" } }, "sha512-/bIYdBLAVsNR3v7gYGaV4pQW3M3kEPx5E8vDxGvxo6khTrGtSSCS7QiFKv9ogzBgZiy0OXLP9zO28U/1nF1mfw=="],
+
     "workbox-background-sync/idb": ["idb@7.1.1", "", {}, "sha512-gchesWBzyvGHRO9W8tzUWFDycow5gwjvFKfyV9FF32Y7F50yZMp7mP+T2mJIWFx49zicqyC4uefHM17o6xKIVQ=="],
+
+    "workbox-background-sync/workbox-core": ["workbox-core@7.4.0", "", {}, "sha512-6BMfd8tYEnN4baG4emG9U0hdXM4gGuDU3ectXuVHnj71vwxTFI7WOpQJC4siTOlVtGqCUtj0ZQNsrvi6kZZTAQ=="],
+
+    "workbox-broadcast-update/workbox-core": ["workbox-core@7.4.0", "", {}, "sha512-6BMfd8tYEnN4baG4emG9U0hdXM4gGuDU3ectXuVHnj71vwxTFI7WOpQJC4siTOlVtGqCUtj0ZQNsrvi6kZZTAQ=="],
 
     "workbox-build/pretty-bytes": ["pretty-bytes@5.6.0", "", {}, "sha512-FFw039TmrBqFK8ma/7OL3sDz/VytdtJr044/QUJtH0wK9lb9jLq9tJyIxUwtQJHwar2BqtiA4iCWSwo9JLkzFg=="],
 
     "workbox-build/rollup": ["rollup@2.80.0", "", { "optionalDependencies": { "fsevents": "~2.3.2" }, "bin": { "rollup": "dist/bin/rollup" } }, "sha512-cIFJOD1DESzpjOBl763Kp1AH7UE/0fcdHe6rZXUdQ9c50uvgigvW97u3IcSeBwOkgqL/PXPBktBCh0KEu5L8XQ=="],
 
+    "workbox-build/workbox-cacheable-response": ["workbox-cacheable-response@7.4.0", "", { "dependencies": { "workbox-core": "7.4.0" } }, "sha512-0Fb8795zg/x23ISFkAc7lbWes6vbw34DGFIMw31cwuHPgDEC/5EYm6m/ZkylLX0EnEbbOyOCLjKgFS/Z5g0HeQ=="],
+
+    "workbox-build/workbox-core": ["workbox-core@7.4.0", "", {}, "sha512-6BMfd8tYEnN4baG4emG9U0hdXM4gGuDU3ectXuVHnj71vwxTFI7WOpQJC4siTOlVtGqCUtj0ZQNsrvi6kZZTAQ=="],
+
+    "workbox-build/workbox-expiration": ["workbox-expiration@7.4.0", "", { "dependencies": { "idb": "^7.0.1", "workbox-core": "7.4.0" } }, "sha512-V50p4BxYhtA80eOvulu8xVfPBgZbkxJ1Jr8UUn0rvqjGhLDqKNtfrDfjJKnLz2U8fO2xGQJTx/SKXNTzHOjnHw=="],
+
+    "workbox-build/workbox-window": ["workbox-window@7.4.0", "", { "dependencies": { "@types/trusted-types": "^2.0.2", "workbox-core": "7.4.0" } }, "sha512-/bIYdBLAVsNR3v7gYGaV4pQW3M3kEPx5E8vDxGvxo6khTrGtSSCS7QiFKv9ogzBgZiy0OXLP9zO28U/1nF1mfw=="],
+
     "workbox-expiration/idb": ["idb@7.1.1", "", {}, "sha512-gchesWBzyvGHRO9W8tzUWFDycow5gwjvFKfyV9FF32Y7F50yZMp7mP+T2mJIWFx49zicqyC4uefHM17o6xKIVQ=="],
+
+    "workbox-google-analytics/workbox-core": ["workbox-core@7.4.0", "", {}, "sha512-6BMfd8tYEnN4baG4emG9U0hdXM4gGuDU3ectXuVHnj71vwxTFI7WOpQJC4siTOlVtGqCUtj0ZQNsrvi6kZZTAQ=="],
+
+    "workbox-navigation-preload/workbox-core": ["workbox-core@7.4.0", "", {}, "sha512-6BMfd8tYEnN4baG4emG9U0hdXM4gGuDU3ectXuVHnj71vwxTFI7WOpQJC4siTOlVtGqCUtj0ZQNsrvi6kZZTAQ=="],
+
+    "workbox-precaching/workbox-core": ["workbox-core@7.4.0", "", {}, "sha512-6BMfd8tYEnN4baG4emG9U0hdXM4gGuDU3ectXuVHnj71vwxTFI7WOpQJC4siTOlVtGqCUtj0ZQNsrvi6kZZTAQ=="],
+
+    "workbox-range-requests/workbox-core": ["workbox-core@7.4.0", "", {}, "sha512-6BMfd8tYEnN4baG4emG9U0hdXM4gGuDU3ectXuVHnj71vwxTFI7WOpQJC4siTOlVtGqCUtj0ZQNsrvi6kZZTAQ=="],
+
+    "workbox-recipes/workbox-cacheable-response": ["workbox-cacheable-response@7.4.0", "", { "dependencies": { "workbox-core": "7.4.0" } }, "sha512-0Fb8795zg/x23ISFkAc7lbWes6vbw34DGFIMw31cwuHPgDEC/5EYm6m/ZkylLX0EnEbbOyOCLjKgFS/Z5g0HeQ=="],
+
+    "workbox-recipes/workbox-core": ["workbox-core@7.4.0", "", {}, "sha512-6BMfd8tYEnN4baG4emG9U0hdXM4gGuDU3ectXuVHnj71vwxTFI7WOpQJC4siTOlVtGqCUtj0ZQNsrvi6kZZTAQ=="],
+
+    "workbox-recipes/workbox-expiration": ["workbox-expiration@7.4.0", "", { "dependencies": { "idb": "^7.0.1", "workbox-core": "7.4.0" } }, "sha512-V50p4BxYhtA80eOvulu8xVfPBgZbkxJ1Jr8UUn0rvqjGhLDqKNtfrDfjJKnLz2U8fO2xGQJTx/SKXNTzHOjnHw=="],
+
+    "workbox-routing/workbox-core": ["workbox-core@7.4.0", "", {}, "sha512-6BMfd8tYEnN4baG4emG9U0hdXM4gGuDU3ectXuVHnj71vwxTFI7WOpQJC4siTOlVtGqCUtj0ZQNsrvi6kZZTAQ=="],
+
+    "workbox-strategies/workbox-core": ["workbox-core@7.4.0", "", {}, "sha512-6BMfd8tYEnN4baG4emG9U0hdXM4gGuDU3ectXuVHnj71vwxTFI7WOpQJC4siTOlVtGqCUtj0ZQNsrvi6kZZTAQ=="],
+
+    "workbox-streams/workbox-core": ["workbox-core@7.4.0", "", {}, "sha512-6BMfd8tYEnN4baG4emG9U0hdXM4gGuDU3ectXuVHnj71vwxTFI7WOpQJC4siTOlVtGqCUtj0ZQNsrvi6kZZTAQ=="],
 
     "@esbuild-kit/core-utils/esbuild/@esbuild/android-arm": ["@esbuild/android-arm@0.18.20", "", { "os": "android", "cpu": "arm" }, "sha512-fyi7TDI/ijKKNZTUJAQqiG5T7YjJXgnzkURqmGj13C6dCqckZBLdl4h7bkhHt/t0WP+zO9/zwroDvANaOqO5Sw=="],
 
@@ -992,6 +1032,8 @@
 
     "filelist/minimatch/brace-expansion": ["brace-expansion@2.0.2", "", { "dependencies": { "balanced-match": "^1.0.0" } }, "sha512-Jt0vHyM+jmUBqojB7E1NIYadt0vI0Qxjxd2TErW94wDz+E2LAm5vKMXXwg6ZZBTHPuUlDgQHKXvjGBdfcF1ZDQ=="],
 
+    "vite-plugin-pwa/workbox-window/workbox-core": ["workbox-core@7.4.0", "", {}, "sha512-6BMfd8tYEnN4baG4emG9U0hdXM4gGuDU3ectXuVHnj71vwxTFI7WOpQJC4siTOlVtGqCUtj0ZQNsrvi6kZZTAQ=="],
+
     "vite/esbuild/@esbuild/aix-ppc64": ["@esbuild/aix-ppc64@0.25.12", "", { "os": "aix", "cpu": "ppc64" }, "sha512-Hhmwd6CInZ3dwpuGTF8fJG6yoWmsToE+vYgD4nytZVxcu1ulHpUQRAB1UJ8+N1Am3Mz4+xOByoQoSZf4D+CpkA=="],
 
     "vite/esbuild/@esbuild/android-arm": ["@esbuild/android-arm@0.25.12", "", { "os": "android", "cpu": "arm" }, "sha512-VJ+sKvNA/GE7Ccacc9Cha7bpS8nyzVv0jdVgwNDaR4gDMC/2TTRc33Ip8qrNYUcpkOHUT5OZ0bUcNNVZQ9RLlg=="],
@@ -1037,6 +1079,10 @@
     "vite/esbuild/@esbuild/win32-ia32": ["@esbuild/win32-ia32@0.25.12", "", { "os": "win32", "cpu": "ia32" }, "sha512-HkqnmmBoCbCwxUKKNPBixiWDGCpQGVsrQfJoVGYLPT41XWF8lHuE5N6WhVia2n4o5QK5M4tYr21827fNhi4byQ=="],
 
     "vite/esbuild/@esbuild/win32-x64": ["@esbuild/win32-x64@0.25.12", "", { "os": "win32", "cpu": "x64" }, "sha512-alJC0uCZpTFrSL0CCDjcgleBXPnCrEAhTBILpeAp7M/OFgoqtAetfBzX0xM00MUsVVPpVjlPuMbREqnZCXaTnA=="],
+
+    "workbox-build/workbox-expiration/idb": ["idb@7.1.1", "", {}, "sha512-gchesWBzyvGHRO9W8tzUWFDycow5gwjvFKfyV9FF32Y7F50yZMp7mP+T2mJIWFx49zicqyC4uefHM17o6xKIVQ=="],
+
+    "workbox-recipes/workbox-expiration/idb": ["idb@7.1.1", "", {}, "sha512-gchesWBzyvGHRO9W8tzUWFDycow5gwjvFKfyV9FF32Y7F50yZMp7mP+T2mJIWFx49zicqyC4uefHM17o6xKIVQ=="],
 
     "filelist/minimatch/brace-expansion/balanced-match": ["balanced-match@1.0.2", "", {}, "sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw=="],
   }
