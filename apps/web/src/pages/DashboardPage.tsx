@@ -24,9 +24,9 @@ export function DashboardPage() {
           <br />
           Войдите, чтобы начать записывать знакомства.
         </div>
-        <Link to="/login" className={styles.loginButton}>
+        <a href="/api/auth/login" className={styles.loginButton}>
           Войти через vas3k.club
-        </Link>
+        </a>
       </div>
     );
   }

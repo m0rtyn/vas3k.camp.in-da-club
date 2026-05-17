@@ -34,26 +34,28 @@ export function LoginPage() {
       </a>
 
       {/* Dev login — only shown in development */}
-      <div className={styles.devSection}>
-        <div className={styles.devTitle}>🔧 Dev-режим</div>
-        <div className={styles.devForm}>
-          <input
-            type="text"
-            className={styles.devInput}
-            placeholder="username"
-            value={devUsername}
-            onChange={(e) => setDevUsername(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleDevLogin()}
-          />
-          <button
-            className={styles.devButton}
-            onClick={handleDevLogin}
-            disabled={isLoading}
-          >
-            Войти
-          </button>
+      {import.meta.env.DEV && (
+        <div className={styles.devSection}>
+          <div className={styles.devTitle}>🔧 Dev-режим</div>
+          <div className={styles.devForm}>
+            <input
+              type="text"
+              className={styles.devInput}
+              placeholder="username"
+              value={devUsername}
+              onChange={(e) => setDevUsername(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleDevLogin()}
+            />
+            <button
+              className={styles.devButton}
+              onClick={handleDevLogin}
+              disabled={isLoading}
+            >
+              Войти
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

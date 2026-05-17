@@ -1,5 +1,5 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAuthStore } from '../store/auth';
 import { useSyncStore } from '../store/sync';
 import { OfflineBanner } from './OfflineBanner';
@@ -16,6 +16,14 @@ export function Layout() {
   useEffect(() => {
     return initSync();
   }, [initSync]);
+
+  const loggingOut = useRef(false);
+  const handleLogout = async () => {
+    if (loggingOut.current) return;
+    loggingOut.current = true;
+    await logout();
+    window.location.href = '/login';
+  };
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     `${styles.navLink} ${isActive ? styles.navLinkActive : ''}`;
@@ -38,7 +46,7 @@ export function Layout() {
             <span>{user.display_name}</span>
             <button
               className={styles.logoutButton}
-              onClick={() => { logout(); window.location.href = '/login'; }}
+              onClick={handleLogout}
               title="Выйти"
             >
               ↩
