@@ -6,7 +6,7 @@ https://vas3k.club/user/vorona_karabuta/
 https://vas3k.club/user/za_waitforit_rina/
 https://vas3k.club/user/vladles/
 https://vas3k.club/user/danis/
-https://vas3k.club/intro/vnvdm/
+https://vas3k.club/user/vnvdm/
 https://vas3k.club/user/mighty_conrad/
 https://vas3k.club/user/Klalofu/
 https://vas3k.club/user/zibzibzib/
@@ -80,8 +80,8 @@ https://vas3k.club/user/ReDetection/
 https://vas3k.club/user/vidog/
 https://vas3k.club/user/JacobBeam/
 https://vas3k.club/user/alskv13/
-https://vas3k.club/user/franconian
-https://vas3k.club/user/NotYetBenGan
+https://vas3k.club/user/franconian/
+https://vas3k.club/user/NotYetBenGan/
 https://vas3k.club/user/niffler/
 https://vas3k.club/user/Yavanosta/
 https://vas3k.club/user/Sega/
@@ -90,7 +90,7 @@ https://vas3k.club/user/Slavsquat/
 https://vas3k.club/user/sesav/
 https://vas3k.club/user/ekatesma/
 https://vas3k.club/user/dimaflusov/
-https://vas3k.club/user/rokiden
+https://vas3k.club/user/rokiden/
 https://vas3k.club/user/kaziwhale/
 https://vas3k.club/user/42Mo/
 https://vas3k.club/user/ari_yusa/
@@ -104,7 +104,6 @@ https://vas3k.club/user/NaimNaimov/
 https://vas3k.club/user/dennisfen/
 https://vas3k.club/user/vesmi/
 https://vas3k.club/user/free0u/
-
 https://vas3k.club/user/festinuz/
 https://vas3k.club/user/svch/
 https://vas3k.club/user/kernelpicnic/
@@ -133,8 +132,6 @@ https://vas3k.club/user/igralino/
 https://vas3k.club/user/alenakhg/
 https://vas3k.club/user/c3zium/
 https://vas3k.club/user/EgorGumin/
-
-
 https://vas3k.club/user/jl3ohapdo/
 https://vas3k.club/user/yurykolesnikov/
 https://vas3k.club/user/vromanv89/
@@ -158,9 +155,8 @@ https://vas3k.club/user/pavel-ignatovich/
 https://vas3k.club/user/vicistomin/
 https://vas3k.club/user/kviat/
 
-participants.md
-Екатерина Глазкова (+Alexander Genin) - даже телеги нет (
-Юлия Лоскутова (+Andrey Ragimov) @yulialoskutova
-Анна Аверченкова (+Алексей Ватолин) 79017735839
-Galina Fisher (+Almaz Gabdelhadiev) ничо нет
-Наталья Белевич (+Maksim Shakavin) ничо нет
+Екатерина Глазкова - пригласил alexgenin
+Юлия Лоскутова - пригласил andreyragimov
+Анна Аверченкова - пригласил vatolinalex
+Galina Fisher - пригласил almzg
+Наталья Белевич - пригласил exelent
