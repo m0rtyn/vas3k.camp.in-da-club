@@ -29,7 +29,7 @@ export function LeaderboardPage() {
         {isLoading ? (
           <div className={styles.loading}>Загрузка...</div>
         ) : entries.length === 0 ? (
-          <div className={styles.empty}>Пока нет данных для рейтинга</div>
+          <div className={styles.empty}>Пока нет знакомств подтверждённых у свидетелей, скоро они появятся</div>
         ) : (
           <div className={styles.list}>
             {entries.map((entry) => (

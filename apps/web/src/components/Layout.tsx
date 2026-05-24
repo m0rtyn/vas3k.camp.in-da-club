@@ -60,25 +60,36 @@ export function Layout() {
                 className={styles.headerAvatar}
               />
             )}
-            <span>{user.display_name}</span>
-            <div className={styles.menuWrapper} ref={menuRef}>
-              <button
-                className={styles.menuButton}
-                onClick={() => setShowMenu((v) => !v)}
-                title="Меню"
+            <span className={styles.headerName}>{user.display_name}</span>
+
+            <div className={styles.headerMenu}>
+              <NavLink
+                to="/about"
+                className={styles.headerAbout}
+                title="Как пользоваться"
+                aria-label="Как пользоваться"
               >
-                ⋮
-              </button>
-              {showMenu && (
-                <div className={styles.menu}>
-                  <button className={styles.menuItem} onClick={resetServiceWorker}>
-                    🔄 Сбросить кэш
-                  </button>
-                  <button className={styles.menuItem} onClick={handleLogout}>
-                    ↩ Выйти
-                  </button>
-                </div>
-              )}
+                ℹ️
+              </NavLink>
+              <div className={styles.menuWrapper} ref={menuRef}>
+                <button
+                  className={styles.menuButton}
+                  onClick={() => setShowMenu((v) => !v)}
+                  title="Меню"
+                >
+                  ⋮
+                </button>
+                {showMenu && (
+                  <div className={styles.menu}>
+                    <button className={styles.menuItem} onClick={resetServiceWorker}>
+                      🔄 Сбросить кэш
+                    </button>
+                    <button className={styles.menuItem} onClick={handleLogout}>
+                      ↩ Выйти
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -111,7 +122,7 @@ export function Layout() {
           <li>
             <NavLink to="/leaderboard" className={navLinkClass}>
               <span className={styles.navIcon}>🏆</span>
-              Рейтинг
+              Либерборд
             </NavLink>
           </li>
           <li>
