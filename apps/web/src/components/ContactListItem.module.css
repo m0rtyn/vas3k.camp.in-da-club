@@ -60,12 +60,12 @@
 }
 
 .badgeConfirmed {
-  background: rgba(76, 175, 80, 0.15);
+  background: var(--color-success-soft);
   color: var(--color-success);
 }
 
 .badgeUnconfirmed {
-  background: rgba(255, 193, 7, 0.15);
+  background: var(--color-warning-soft);
   color: var(--color-warning);
 }
 

@@ -43,8 +43,8 @@
   margin-top: 12px;
   padding: 8px 16px;
   font-size: 14px;
-  background: var(--color-primary);
-  color: white;
+  background: var(--color-accent);
+  color: var(--color-on-accent);
   border: none;
   border-radius: 8px;
   cursor: pointer;

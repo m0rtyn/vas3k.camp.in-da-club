@@ -28,7 +28,7 @@
 .filterButtonActive {
   border-color: var(--color-accent);
   color: var(--color-accent);
-  background: rgba(255, 102, 0, 0.1);
+  background: var(--color-accent-soft);
 }
 
 .empty {

@@ -56,7 +56,7 @@
 }
 
 .digitInput:focus {
-  border-color: var(--color-primary);
+  border-color: var(--color-accent);
 }
 
 .submitButton {
@@ -66,7 +66,7 @@
   font-size: 16px;
   font-weight: 600;
   background: var(--color-accent);
-  color: #fff;
+  color: var(--color-on-accent);
   border: none;
   border-radius: var(--radius);
   cursor: pointer;

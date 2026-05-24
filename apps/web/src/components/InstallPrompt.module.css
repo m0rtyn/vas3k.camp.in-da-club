@@ -12,7 +12,7 @@
   align-items: center;
   gap: 12px;
   font-size: 14px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-overlay);
   max-width: calc(100vw - 32px);
 }
 
@@ -24,7 +24,7 @@
 
 .install {
   background: var(--color-accent);
-  color: #fff;
+  color: var(--color-on-accent);
   border: none;
   border-radius: var(--radius);
   padding: 6px 14px;

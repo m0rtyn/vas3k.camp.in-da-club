@@ -54,6 +54,7 @@
 .header {
   display: flex;
   align-items: center;
+  gap: 1rem;
   justify-content: space-between;
   padding: 12px 16px;
   background: var(--color-surface);
@@ -68,6 +69,19 @@
   align-items: center;
   justify-self: center;
   gap: 0.3em;
+}
+
+.logoShort {
+  display: none;
+}
+
+@media (max-width: 400px) {
+  .logoFull {
+    display: none;
+  }
+  .logoShort {
+    display: inline;
+  }
 }
 
 .logoSign {
@@ -176,8 +190,8 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   padding: 4px 0;
-  min-width: 180px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  min-width: 220px;
+  box-shadow: var(--shadow-menu);
   z-index: 100;
 }
 

@@ -1,27 +1,167 @@
-:root {
-  /* vas3k.club inspired palette */
+/*
+ * Design tokens & theming.
+ * Themes are applied via attributes on <html>:
+ *   data-theme="dark" | "light"   — base palette
+ *   data-contrast="more"          — high-contrast modifier on top
+ * Default is dark. System preference fallback is handled by the inline
+ * script in index.html and the theme store.
+ */
+
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+
   --color-bg: #0a0a0a;
   --color-surface: #1a1a1a;
   --color-surface-hover: #252525;
   --color-border: #333;
+
   --color-text: #e0e0e0;
   --color-text-primary: var(--color-text);
   --color-text-secondary: #888;
+
   --color-accent: #ff6600;
   --color-accent-hover: #ff8533;
-  --color-success: #4caf50;
-  --color-error: #f44336;
-  --color-warning: #ffc107;
+  --color-accent-soft: rgba(255, 102, 0, 0.1);
+  --color-primary: var(--color-accent);
+  --color-on-accent: #ffffff;
 
-  /* Typography */
+  --color-success: #4caf50;
+  --color-success-soft: rgba(76, 175, 80, 0.15);
+  --color-on-success: #ffffff;
+
+  --color-error: #f44336;
+  --color-danger: var(--color-error);
+  --color-danger-soft: rgba(244, 67, 54, 0.12);
+  --color-on-danger: #ffffff;
+
+  --color-warning: #ffc107;
+  --color-warning-soft: rgba(255, 193, 7, 0.15);
+  --color-on-warning: #000000;
+
+  --shadow-menu: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-overlay: 0 4px 24px rgba(0, 0, 0, 0.5);
+  --shadow-elev-1: 0 1px 3px rgba(0, 0, 0, 0.35);
+
+  --font-weight-base: 400;
+  --border-width: 1px;
+
   --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif,
     'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Twemoji Mozilla', emoji;
   --font-mono: 'SF Mono', 'Fira Code', monospace;
 
-  /* Sizing */
   --radius: 8px;
   --radius-lg: 12px;
   --max-width: 600px;
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+
+  --color-bg: #fafafa;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f0f0f0;
+  --color-border: #e0e0e0;
+
+  --color-text: #1a1a1a;
+  --color-text-primary: var(--color-text);
+  --color-text-secondary: #555;
+
+  /* Deep orange — contrast >= 6:1 on white (AA normal, AAA large) */
+  --color-accent: #b33b00;
+  --color-accent-hover: #993300;
+  --color-accent-soft: rgba(179, 59, 0, 0.1);
+  --color-on-accent: #ffffff;
+
+  --color-success: #2e7d32;
+  --color-success-soft: rgba(46, 125, 50, 0.12);
+  --color-on-success: #ffffff;
+
+  --color-error: #c62828;
+  --color-danger: var(--color-error);
+  --color-danger-soft: rgba(198, 40, 40, 0.1);
+  --color-on-danger: #ffffff;
+
+  --color-warning: #ed6c02;
+  --color-warning-soft: rgba(237, 108, 2, 0.14);
+  --color-on-warning: #ffffff;
+
+  --shadow-menu: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-overlay: 0 4px 24px rgba(0, 0, 0, 0.18);
+  --shadow-elev-1: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme='dark'][data-contrast='more'],
+:root[data-contrast='more'] {
+  --color-bg: #000000;
+  --color-surface: #000000;
+  --color-surface-hover: #1a1a1a;
+  --color-border: #ffffff;
+
+  --color-text: #ffffff;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #e6e6e6;
+
+  /* Yellow on black — WCAG AAA (> 15:1) */
+  --color-accent: #ffd400;
+  --color-accent-hover: #ffe14d;
+  --color-accent-soft: rgba(255, 212, 0, 0.2);
+  --color-on-accent: #000000;
+
+  --color-success: #00e676;
+  --color-success-soft: rgba(0, 230, 118, 0.2);
+  --color-on-success: #000000;
+
+  --color-error: #ff5252;
+  --color-danger: var(--color-error);
+  --color-danger-soft: rgba(255, 82, 82, 0.2);
+  --color-on-danger: #000000;
+
+  --color-warning: #ffd400;
+  --color-warning-soft: rgba(255, 212, 0, 0.2);
+  --color-on-warning: #000000;
+
+  --shadow-menu: 0 4px 16px rgba(0, 0, 0, 0.85);
+  --shadow-overlay: 0 4px 24px rgba(0, 0, 0, 0.9);
+
+  --font-weight-base: 500;
+  --border-width: 2px;
+}
+
+[data-theme='light'][data-contrast='more'] {
+  --color-bg: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-hover: #ffeb99;
+  --color-border: #000000;
+
+  --color-text: #000000;
+  --color-text-primary: #000000;
+  --color-text-secondary: #1a1a1a;
+
+  /* Very deep orange — contrast >= 7:1 on white (AAA) */
+  --color-accent: #b33b00;
+  --color-accent-hover: #993300;
+  --color-accent-soft: rgba(179, 59, 0, 0.15);
+  --color-on-accent: #ffffff;
+
+  --color-success: #006400;
+  --color-success-soft: rgba(0, 100, 0, 0.15);
+  --color-on-success: #ffffff;
+
+  --color-error: #a00000;
+  --color-danger: var(--color-error);
+  --color-danger-soft: rgba(160, 0, 0, 0.15);
+  --color-on-danger: #ffffff;
+
+  --color-warning: #806600;
+  --color-warning-soft: rgba(128, 102, 0, 0.18);
+  --color-on-warning: #ffffff;
+
+  --shadow-menu: 0 4px 16px rgba(0, 0, 0, 0.25);
+  --shadow-overlay: 0 4px 24px rgba(0, 0, 0, 0.3);
+
+  --font-weight-base: 500;
+  --border-width: 2px;
 }
 
 * {
@@ -32,11 +172,13 @@
 
 body {
   font-family: var(--font-family);
+  font-weight: var(--font-weight-base);
   background: var(--color-bg);
   color: var(--color-text);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 a {
@@ -58,7 +200,6 @@ img {
   height: auto;
 }
 
-/* Utility */
 .container {
   max-width: var(--max-width);
   margin: 0 auto;

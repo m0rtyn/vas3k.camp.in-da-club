@@ -4,6 +4,7 @@ import { useAuthStore } from '../store/auth';
 import { useSyncStore } from '../store/sync';
 import { usePwaStore } from '../store/pwa';
 import { OfflineBanner } from './OfflineBanner';
+import { ThemeSwitcher } from './ThemeSwitcher';
 import styles from './Layout.module.css';
 
 export function Layout() {
@@ -49,7 +50,11 @@ export function Layout() {
     <div className={styles.layout}>
       <header className={styles.header}>
         <NavLink to="/" className={styles.logo}>
-          Вастрик<Logo/>ВКлубе
+          <span className={styles.logoFull}>Вастрик</span>
+          <span className={styles.logoShort}>Вас3к</span>
+          <Logo/>
+          <span className={styles.logoFull}>ВКлубе</span>
+          <span className={styles.logoShort}>ВК</span>
         </NavLink>
         {user && (
           <div className={styles.headerUser}>
@@ -81,6 +86,7 @@ export function Layout() {
                 </button>
                 {showMenu && (
                   <div className={styles.menu}>
+                    <ThemeSwitcher />
                     <button className={styles.menuItem} onClick={resetServiceWorker}>
                       🔄 Сбросить кэш
                     </button>

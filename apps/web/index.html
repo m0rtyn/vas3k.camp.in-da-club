@@ -9,6 +9,33 @@
     <link rel="apple-touch-icon" href="/icon-192.svg" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <script>
+      // FOUC prevention: apply theme before React mounts.
+      (function () {
+        try {
+          var raw = localStorage.getItem('vklube-theme');
+          var saved = raw ? JSON.parse(raw) : null;
+          var theme = saved && (saved.theme === 'dark' || saved.theme === 'light') ? saved.theme : 'system';
+          var highContrast = !!(saved && saved.highContrast);
+          if (!saved && window.matchMedia && window.matchMedia('(prefers-contrast: more)').matches) {
+            highContrast = true;
+          }
+          var resolved = theme;
+          if (theme === 'system') {
+            resolved = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+          }
+          document.documentElement.setAttribute('data-theme', resolved);
+          if (highContrast) document.documentElement.setAttribute('data-contrast', 'more');
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) {
+            var color;
+            if (highContrast) color = resolved === 'light' ? '#ffffff' : '#000000';
+            else color = resolved === 'light' ? '#ffffff' : '#1a1a1a';
+            meta.setAttribute('content', color);
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
