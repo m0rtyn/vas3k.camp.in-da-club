@@ -49,7 +49,7 @@ export function LeaderboardPage() {
                   <div className={styles.avatarPlaceholder}>?</div>
                 )}
 
-                <div className={`${styles.name} ${!entry.username ? styles.anonymous : ''}`}>
+                <div className={`${styles.name} ${!entry.camp_username ? styles.anonymous : ''}`}>
                   {entry.display_name || `Участник #${entry.rank}`}
                 </div>
               </div>

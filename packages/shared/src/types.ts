@@ -14,12 +14,18 @@ export interface User {
 
 export interface Meeting {
   id: string;
-  /** Camp username of the meeting initiator (server-resolved from slug). */
+  /** Club slug (vas3k.club username) of the meeting initiator. Used for display. */
+  initiator_username: string;
+  /** Camp username of the meeting initiator. Used in URLs / NFC chips. */
   initiator_camp_username: string;
-  /** Camp username of the meeting target (server-resolved from slug). */
+  /** Club slug of the meeting target. */
+  target_username: string;
+  /** Camp username of the meeting target. */
   target_camp_username: string;
   witness_code: string | null;
   witness_code_expires_at: string | null;
+  /** Club slug of the witness, if any. */
+  witness_username: string | null;
   /** Camp username of the witness, if any. */
   witness_camp_username: string | null;
   status: MeetingStatus;

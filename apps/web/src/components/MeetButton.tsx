@@ -6,10 +6,13 @@ import { WitnessCodeDisplay } from './WitnessCodeDisplay';
 import styles from './MeetButton.module.css';
 
 interface MeetButtonProps {
+  /** Target user's club slug. Stored in optimistic local meeting for display. */
   targetUsername: string;
+  /** Target user's camp_username. Used in the API payload. */
+  targetCampUsername: string;
 }
 
-export function MeetButton({ targetUsername }: MeetButtonProps) {
+export function MeetButton({ targetUsername, targetCampUsername }: MeetButtonProps) {
   const { isAuthenticated } = useAuthStore();
   const meetings = useMeetingsStore((s) => s.meetings);
   const { createMeeting, requestWitnessCode, refreshMeeting } = useMeetingsStore();
@@ -20,7 +23,8 @@ export function MeetButton({ targetUsername }: MeetButtonProps) {
   const existingMeeting = meetings.find(
     (m) =>
       m.status !== 'cancelled' &&
-      (m.initiator_username === targetUsername || m.target_username === targetUsername),
+      (m.initiator_camp_username === targetCampUsername ||
+        m.target_camp_username === targetCampUsername),
   );
 
   // Poll a single meeting while its witness code is active.
@@ -161,7 +165,7 @@ export function MeetButton({ targetUsername }: MeetButtonProps) {
     setIsLoading(true);
     setError(null);
     try {
-      await createMeeting(targetUsername);
+      await createMeeting({ targetUsername, targetCampUsername });
     } catch (err: unknown) {
       const message = (err as { message?: string })?.message || 'Ошибка';
       setError(message);

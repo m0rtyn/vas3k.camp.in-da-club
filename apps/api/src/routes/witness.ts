@@ -4,6 +4,7 @@ import { meetings, users } from '../schema';
 import { eq, and, sql } from 'drizzle-orm';
 import { CONTACTS_PER_APPROVAL } from '@vklube/shared';
 import type { AppEnv } from '../types';
+import { getProjectedMeeting } from '../lib/projections';
 
 const witnessRouter = new Hono<AppEnv>();
 
@@ -62,7 +63,7 @@ witnessRouter.post('/confirm', async (c) => {
           confirmed_at: new Date(),
         })
         .where(eq(meetings.id, meeting.id))
-        .returning();
+        .returning({ id: meetings.id });
 
       // 2. Decrement witness approvals
       await tx
@@ -86,7 +87,9 @@ witnessRouter.post('/confirm', async (c) => {
         }
       }
 
-      return updated;
+      const projected = await getProjectedMeeting(tx, updated.id, witness.username);
+
+      return projected;
     });
 
     return c.json(confirmed);

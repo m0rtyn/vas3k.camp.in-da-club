@@ -5,6 +5,8 @@ import { eq, and, ne, or, sql } from 'drizzle-orm';
 import { CANCEL_WINDOW_MS, CONTACTS_PER_APPROVAL } from '@vklube/shared';
 import type { SyncAction } from '@vklube/shared';
 import type { AppEnv } from '../types';
+import { meetingProjection, getProjectedMeeting } from '../lib/projections';
+import { resolveCampUsernameToSlug } from '../lib/camp-username';
 
 const sync = new Hono<AppEnv>();
 
@@ -60,14 +62,19 @@ async function processAction(
 ): Promise<unknown> {
   switch (item.action) {
     case 'create_meeting': {
-      const { target_username, client_created_at } = item.payload as {
-        target_username: string;
+      const { target_camp_username, client_created_at } = item.payload as {
+        target_camp_username: string;
         client_created_at: string;
       };
 
+      const target_username = await resolveCampUsernameToSlug(target_camp_username);
+      if (!target_username) {
+        throw new Error('Target user not found');
+      }
+
       // Check for existing active meeting
       const existing = await db
-        .select()
+        .select(meetingProjection(user.username))
         .from(meetings)
         .where(
           and(
@@ -90,7 +97,7 @@ async function processAction(
         return existing[0]; // Already exists, return it (idempotent)
       }
 
-      const [meeting] = await db
+      const [inserted] = await db
         .insert(meetings)
         .values({
           initiator_username: user.username,
@@ -98,7 +105,9 @@ async function processAction(
           status: 'unconfirmed',
           client_created_at: new Date(client_created_at),
         })
-        .returning();
+        .returning({ id: meetings.id });
+
+      const meeting = await getProjectedMeeting(db, inserted.id, user.username);
 
       return meeting;
     }
@@ -119,11 +128,12 @@ async function processAction(
         throw new Error('Cancel window expired');
       }
 
-      const [cancelled] = await db
+      await db
         .update(meetings)
         .set({ status: 'cancelled', cancelled_at: new Date() })
-        .where(eq(meetings.id, meeting_id))
-        .returning();
+        .where(eq(meetings.id, meeting_id));
+
+      const cancelled = await getProjectedMeeting(db, meeting_id, user.username);
 
       return cancelled;
     }
@@ -180,7 +190,7 @@ async function processAction(
             confirmed_at: new Date(),
           })
           .where(eq(meetings.id, meeting.id))
-          .returning();
+          .returning({ id: meetings.id });
 
         await tx
           .update(users)
@@ -202,7 +212,9 @@ async function processAction(
           }
         }
 
-        return confirmed;
+        const projected = await getProjectedMeeting(tx, confirmed.id, user.username);
+
+        return projected;
       });
     }
 

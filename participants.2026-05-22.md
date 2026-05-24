@@ -43,13 +43,15 @@ https://vas3k.club/user/Doredel/
 https://vas3k.club/user/timakovdmitry/
 https://vas3k.club/user/RationalAnswer/
 https://vas3k.club/user/malagrugrous/
-https://vas3k.club/user/lebster/
+https://vas3k.club/user/ugolek/
 https://vas3k.club/user/dpaliy/
 https://vas3k.club/user/monomarh/
 https://vas3k.club/user/Htota/
 https://vas3k.club/user/ppilif/
+https://vas3k.club/user/Gleb17/
 https://vas3k.club/user/AlexGaidukov/
 https://vas3k.club/user/biteryakov/
+https://vas3k.club/user/zmievsa/
 https://vas3k.club/user/lyyn/
 https://vas3k.club/user/alinushik/
 https://vas3k.club/user/aebushmin/
@@ -61,14 +63,17 @@ https://vas3k.club/user/stfbee/
 https://vas3k.club/user/paw_lick/
 https://vas3k.club/user/dennytarasov
 https://vas3k.club/user/alexgenin/
+https://vas3k.club/user/Katya_G/
 https://vas3k.club/user/enchantner/
 https://vas3k.club/user/Ilfa/
 https://vas3k.club/user/nepofigist/
+https://vas3k.club/user/tatovs/
 https://vas3k.club/user/bioern
 https://vas3k.club/user/v3kcl_user_0123/
 https://vas3k.club/user/faust/
 https://vas3k.club/user/triod
 https://vas3k.club/user/L3if/
+https://vas3k.club/user/irinazhukova/
 https://vas3k.club/user/icekom/
 https://vas3k.club/user/ozeranskii/
 https://vas3k.club/user/ReDetection/
@@ -79,7 +84,7 @@ https://vas3k.club/user/franconian
 https://vas3k.club/user/NotYetBenGan
 https://vas3k.club/user/niffler/
 https://vas3k.club/user/Yavanosta/
-https://vas3k.club/user/Istizap/
+https://vas3k.club/user/Sega/
 https://vas3k.club/user/Doctor_pomogite/
 https://vas3k.club/user/Slavsquat/
 https://vas3k.club/user/sesav/
@@ -91,6 +96,7 @@ https://vas3k.club/user/42Mo/
 https://vas3k.club/user/ari_yusa/
 https://vas3k.club/user/vivishko/
 https://vas3k.club/user/andreyragimov/
+https://vas3k.club/user/andreyragimov/
 https://vas3k.club/user/lcd1232/
 https://vas3k.club/user/vatolinalex/
 https://vas3k.club/user/zlebnik/
@@ -98,10 +104,12 @@ https://vas3k.club/user/NaimNaimov/
 https://vas3k.club/user/dennisfen/
 https://vas3k.club/user/vesmi/
 https://vas3k.club/user/free0u/
+
 https://vas3k.club/user/festinuz/
 https://vas3k.club/user/svch/
 https://vas3k.club/user/kernelpicnic/
 https://vas3k.club/user/almzg/
+https://vas3k.club/user/galinafisher1010/
 https://vas3k.club/user/ArseniyB/
 https://vas3k.club/user/ivannotbad/
 https://vas3k.club/user/vanilevsky/
@@ -112,12 +120,12 @@ https://vas3k.club/user/dprokoptsev/
 https://vas3k.club/user/leemurus/
 https://vas3k.club/user/dmitrynazarenkov/
 https://vas3k.club/user/Kirze/
-https://vas3k.club/user/daniilvachaev/
 https://vas3k.club/user/grbit/
 https://vas3k.club/user/enemorrian/
 https://vas3k.club/user/nikitakoifman/
 https://vas3k.club/user/masik_plus/
 https://vas3k.club/user/exelent/
+https://vas3k.club/user/natalliabialevich/
 https://vas3k.club/user/AlekseySherchenkov/
 https://vas3k.club/user/zorin_al/
 https://vas3k.club/user/vkd/
@@ -125,6 +133,8 @@ https://vas3k.club/user/igralino/
 https://vas3k.club/user/alenakhg/
 https://vas3k.club/user/c3zium/
 https://vas3k.club/user/EgorGumin/
+
+
 https://vas3k.club/user/jl3ohapdo/
 https://vas3k.club/user/yurykolesnikov/
 https://vas3k.club/user/vromanv89/
@@ -145,8 +155,10 @@ https://vas3k.club/user/sleepin/
 https://vas3k.club/user/ryaganin/
 https://vas3k.club/user/lopin/
 https://vas3k.club/user/pavel-ignatovich/
-https://vas3k.club/user/zmievsa/
+https://vas3k.club/user/vicistomin/
+https://vas3k.club/user/kviat/
 
+participants.md
 Екатерина Глазкова (+Alexander Genin) - даже телеги нет (
 Юлия Лоскутова (+Andrey Ragimov) @yulialoskutova
 Анна Аверченкова (+Алексей Ватолин) 79017735839

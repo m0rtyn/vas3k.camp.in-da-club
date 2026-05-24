@@ -18,16 +18,26 @@ export const meetingStatusEnum = pgEnum('meeting_status', [
   'cancelled',
 ]);
 
-export const users = pgTable('users', {
-  username: text('username').primaryKey(),
-  display_name: text('display_name').notNull(),
-  avatar_url: text('avatar_url').notNull().default(''),
-  bio: text('bio'),
-  approvals_available: integer('approvals_available').notNull().default(3),
-  confirmed_contacts_count: integer('confirmed_contacts_count').notNull().default(0),
-  is_admin: boolean('is_admin').notNull().default(false),
-  created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-});
+export const users = pgTable(
+  'users',
+  {
+    username: text('username').primaryKey(),
+    // Nullable at the DB level: OIDC `/callback` inserts a new row before it
+    // can generate a unique camp_username (which requires the row to exist
+    // for the UPDATE-based collision retry). Auth middleware self-heals any
+    // remaining NULLs on first authenticated request. All authenticated
+    // boundaries (`AuthUser`) treat the value as non-null.
+    camp_username: text('camp_username'),
+    display_name: text('display_name').notNull(),
+    avatar_url: text('avatar_url').notNull().default(''),
+    bio: text('bio'),
+    approvals_available: integer('approvals_available').notNull().default(3),
+    confirmed_contacts_count: integer('confirmed_contacts_count').notNull().default(0),
+    is_admin: boolean('is_admin').notNull().default(false),
+    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [uniqueIndex('users_camp_username_unique').on(table.camp_username)],
+);
 
 export const meetings = pgTable(
   'meetings',

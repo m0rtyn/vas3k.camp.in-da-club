@@ -9,17 +9,22 @@ import {
 import { useAuthStore } from './auth';
 import type { Meeting } from '@vklube/shared';
 
+interface CreateMeetingArgs {
+  targetUsername: string;
+  targetCampUsername: string;
+}
+
 interface MeetingsState {
   meetings: Meeting[];
   isLoading: boolean;
 
   fetchMeetings: () => Promise<void>;
   refreshMeeting: (meetingId: string) => Promise<Meeting | null>;
-  createMeeting: (targetUsername: string) => Promise<Meeting>;
+  createMeeting: (args: CreateMeetingArgs) => Promise<Meeting>;
   requestWitnessCode: (meetingId: string) => Promise<Meeting>;
   confirmAsWitness: (witnessCode: string) => Promise<Meeting>;
   cancelMeeting: (meetingId: string) => Promise<void>;
-  getMeetingWithUser: (username: string) => Meeting | undefined;
+  getMeetingWithUser: (campUsername: string) => Meeting | undefined;
 }
 
 export const useMeetingsStore = create<MeetingsState>((set, get) => ({
@@ -64,24 +69,27 @@ export const useMeetingsStore = create<MeetingsState>((set, get) => ({
     }
   },
 
-  createMeeting: async (targetUsername: string) => {
+  createMeeting: async ({ targetUsername, targetCampUsername }) => {
     const now = new Date().toISOString();
 
-    const initiator = useAuthStore.getState().user?.username;
-    if (!initiator) {
+    const currentUser = useAuthStore.getState().user;
+    if (!currentUser) {
       throw new Error('Not authenticated');
     }
 
     // Optimistic local meeting
     const localMeeting: Meeting = {
       id: crypto.randomUUID(),
-      initiator_username: initiator,
+      initiator_username: currentUser.username,
+      initiator_camp_username: currentUser.camp_username,
       target_username: targetUsername,
+      target_camp_username: targetCampUsername,
       witness_code: null,
       witness_code_expires_at: null,
       witness_username: null,
+      witness_camp_username: null,
       status: 'unconfirmed',
-      hidden_by: [],
+      is_hidden_by_me: false,
       created_at: now,
       confirmed_at: null,
       cancelled_at: null,
@@ -90,7 +98,7 @@ export const useMeetingsStore = create<MeetingsState>((set, get) => ({
 
     if (navigator.onLine) {
       const meeting = await api.post<Meeting>('/meetings', {
-        target_username: targetUsername,
+        target_camp_username: targetCampUsername,
         client_created_at: now,
       });
       await saveMeeting(meeting);
@@ -103,7 +111,7 @@ export const useMeetingsStore = create<MeetingsState>((set, get) => ({
     await addToSyncQueue({
       action: 'create_meeting',
       payload: {
-        target_username: targetUsername,
+        target_camp_username: targetCampUsername,
         client_created_at: now,
       },
       created_at: now,
@@ -153,11 +161,12 @@ export const useMeetingsStore = create<MeetingsState>((set, get) => ({
     set({ meetings: get().meetings.filter((m) => m.id !== meetingId) });
   },
 
-  getMeetingWithUser: (username: string) => {
+  getMeetingWithUser: (campUsername: string) => {
     return get().meetings.find(
       (m) =>
         m.status !== 'cancelled' &&
-        (m.initiator_username === username || m.target_username === username),
+        (m.initiator_camp_username === campUsername ||
+          m.target_camp_username === campUsername),
     );
   },
 }));

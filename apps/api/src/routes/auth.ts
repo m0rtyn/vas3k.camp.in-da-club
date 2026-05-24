@@ -5,6 +5,7 @@ import { users } from '../schema';
 import { eq } from 'drizzle-orm';
 import type { AppEnv } from '../types';
 import { createSession, deleteSession, SESSION_COOKIE_NAME, sessionCookieOptions } from '../lib/session';
+import { generateAndAssignCampUsername } from '../lib/camp-username';
 
 const auth = new Hono<AppEnv>();
 
@@ -83,8 +84,11 @@ auth.get('/callback', async (c) => {
 
   const { slug, full_name, avatar, bio } = profileData.user;
 
-  // 3. Upsert user in database
-  await db
+  // 3. Upsert user in database, then assign camp_username if missing.
+  // Auth middleware also self-heals as a safety net, but we generate
+  // synchronously here to avoid a window where the user is blocked by
+  // generation failures on first authenticated request.
+  const [upserted] = await db
     .insert(users)
     .values({
       username: slug,
@@ -99,7 +103,16 @@ auth.get('/callback', async (c) => {
         avatar_url: avatar || '',
         bio: bio || null,
       },
-    });
+    })
+    .returning({ camp_username: users.camp_username });
+
+  if (!upserted?.camp_username) {
+    const assigned = await generateAndAssignCampUsername(slug);
+    if (!assigned) {
+      console.error('[auth/callback] camp_username generation failed for', slug);
+      return c.json({ error: 'server_error', message: 'Failed to assign camp_username' }, 500);
+    }
+  }
 
   // 4. Create session and set httpOnly cookie
   const session = await createSession(slug);
@@ -166,6 +179,15 @@ auth.post('/dev-login', async (c) => {
       },
     })
     .returning();
+
+  if (!user.camp_username) {
+    const assigned = await generateAndAssignCampUsername(username);
+    if (assigned) {
+      user.camp_username = assigned;
+    } else {
+      console.error('[auth/dev-login] camp_username generation failed for', username);
+    }
+  }
 
   const session = await createSession(username);
   setCookie(c, SESSION_COOKIE_NAME, session.id, sessionCookieOptions(false));
