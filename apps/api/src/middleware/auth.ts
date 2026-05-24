@@ -7,6 +7,7 @@ import { SESSION_COOKIE_NAME } from '../lib/session';
 
 export type AuthUser = {
   username: string;
+  camp_username: string | null;
   display_name: string;
   avatar_url: string;
   bio: string | null;
@@ -33,6 +34,7 @@ export async function authMiddleware(c: Context<Env>, next: Next) {
     const [row] = await db
       .select({
         username: users.username,
+        camp_username: users.camp_username,
         display_name: users.display_name,
         avatar_url: users.avatar_url,
         bio: users.bio,
