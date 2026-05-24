@@ -120,15 +120,15 @@ export function Layout() {
             </NavLink>
           </li>
           <li>
-            <NavLink to="/leaderboard" className={navLinkClass}>
-              <span className={styles.navIcon}>🏆</span>
-              Либерборд
+            <NavLink to="/witness" className={navLinkClass}>
+              <span className={styles.navIcon}>👁️</span>
+              Свидетель
             </NavLink>
           </li>
           <li>
-            <NavLink to="/witness" className={navLinkClass}>
-              <span className={styles.navIcon}>👁</span>
-              Свидетель
+            <NavLink to="/leaderboard" className={navLinkClass}>
+              <span className={styles.navIcon}>🏆</span>
+              Рейтинг
             </NavLink>
           </li>
         </ul>

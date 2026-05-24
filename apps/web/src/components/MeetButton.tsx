@@ -151,7 +151,7 @@ export function MeetButton({ targetUsername, targetCampUsername }: MeetButtonPro
           disabled={isLoading}
           style={{ marginTop: 8 }}
         >
-          {isLoading ? 'Генерирую...' : '👁 Позвать свидетеля'}
+          {isLoading ? 'Генерирую...' : '👁️ Есть свидетель'}
         </button>
         {error && <div className={styles.metDate} style={{ color: 'var(--color-error)' }}>{error}</div>}
       </div>

@@ -24,7 +24,7 @@ export function LeaderboardPage() {
   return (
     <AuthGuard>
       <div className={styles.page}>
-        <div className={styles.title}>🏆 Рейтинг</div>
+        <div className={styles.title}>🏆 Либерборд</div>
 
         {isLoading ? (
           <div className={styles.loading}>Загрузка...</div>
