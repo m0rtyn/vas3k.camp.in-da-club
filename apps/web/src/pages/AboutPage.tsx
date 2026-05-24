@@ -47,7 +47,7 @@ export function AboutPage() {
         <span className={styles.heroEmoji} aria-hidden="true">
           🤝
         </span>
-        <h1 className={styles.heroTitle}>Как работает ВКлубе</h1>
+        <h1 className={styles.heroTitle}>Как работает Вастрик.ВКлубе</h1>
         {/* <p className={styles.heroSubtitle}>
           Приложение для знакомств на кэмпе.
         </p> */}
@@ -218,8 +218,7 @@ export function AboutPage() {
           <details className={styles.faqItem}>
             <summary>Зачем нужен свидетель?</summary>
             <p className={styles.faqAnswer}>
-              Чтобы нельзя было «накрутить» знакомства в одиночку. Встреча
-              засчитывается только когда её подтвердил третий участник.
+              Чтобы нельзя было «накрутить» знакомства в одиночку и чтобы было веселее. Встреча и без него засчитается, но не пойдёт в общий зачёт.
             </p>
           </details>
           <details className={styles.faqItem}>
@@ -232,8 +231,7 @@ export function AboutPage() {
           <details className={styles.faqItem}>
             <summary>Что такое username?</summary>
             <p className={styles.faqAnswer}>
-              Короткое имя для кэмпа — то, что после слэша в твоей ссылке. Его удобно
-              писать на бейдже или печатать на NFC-метке. Он содежит твой юзернейм в клубе и ещё одно слово.
+              Твой позывной для приложения — то, что после слэша в твоей ссылке. Его удобно использовать на NFC-метке. Он содежит твой юзернейм из клуба и ещё одно слово.
             </p>
           </details>
         </div>
@@ -243,7 +241,7 @@ export function AboutPage() {
         <Link to="/" className={styles.ctaButton}>
           Поехали 🚀
         </Link>
-        <p className={styles.ctaHint}>Знакомься, ВКлубе ждёт.</p>
+        <p className={styles.ctaHint}>Знакомься, Вася ждёт.</p>
       </footer>
     </article>
   );

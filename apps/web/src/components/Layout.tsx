@@ -49,7 +49,7 @@ export function Layout() {
     <div className={styles.layout}>
       <header className={styles.header}>
         <NavLink to="/" className={styles.logo}>
-          ВКлубе
+          Вастрик<Logo/>ВКлубе
         </NavLink>
         {user && (
           <div className={styles.headerUser}>
@@ -134,5 +134,12 @@ export function Layout() {
         </ul>
       </nav>
     </div>
+  );
+}
+
+export function Logo() {
+  return (
+      // <span className={styles.logoSign}>✖︎</span>
+      <span className={styles.logoSign}>+</span>
   );
 }

@@ -34,7 +34,7 @@ export function LoginPage() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.title}>👋 ВКлубе</div>
+      <div className={styles.title}>👋 Вастрик.ВКлубе</div>
       <div className={styles.subtitle}>
         Войдите через vas3k.club, чтобы записывать знакомства на кэмпе
       </div>

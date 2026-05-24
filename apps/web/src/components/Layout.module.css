@@ -64,6 +64,22 @@
   font-size: 18px;
   font-weight: 700;
   color: var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-self: center;
+  gap: 0.3em;
+}
+
+.logoSign {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 0.6em;
+  box-sizing: content-box;
+  font-family: "system-ui, sans-serif";
+  font-size: 2em;
+  text-decoration: none;
+  font-weight: 800;
 }
 
 .headerMenu {
