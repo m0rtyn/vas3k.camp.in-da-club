@@ -108,7 +108,7 @@ export function WitnessPage() {
   if (approvals === 0) {
     return (
       <div className={styles.page}>
-        <div className={styles.icon}>👁</div>
+        <div className={styles.icon}>👁️</div>
         <div className={styles.title}>Свидетель</div>
         <div className={styles.noApprovals}>
           У вас нет доступных апрувов. Знакомьтесь с людьми, чтобы получить новые!
@@ -120,7 +120,7 @@ export function WitnessPage() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.icon}>👁</div>
+      <div className={styles.icon}>👁️</div>
       <div className={styles.title}>Свидетель</div>
       <div className={styles.description}>
         Введите код, который показывают участники встречи

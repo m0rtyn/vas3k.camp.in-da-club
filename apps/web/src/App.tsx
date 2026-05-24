@@ -10,6 +10,7 @@ import { ContactsPage } from './pages/ContactsPage';
 import { LeaderboardPage } from './pages/LeaderboardPage';
 import { WitnessPage } from './pages/WitnessPage';
 import { AdminPage } from './pages/AdminPage';
+import { AboutPage } from './pages/AboutPage';
 import { LoginPage } from './pages/LoginPage';
 import { CallbackPage } from './pages/CallbackPage';
 
@@ -29,6 +30,7 @@ export function App() {
         <Route path="/leaderboard" element={<LeaderboardPage />} />
         <Route path="/witness" element={<WitnessPage />} />
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/about" element={<AboutPage />} />
         {/* Catch-all: NFC landing or own profile. Param value is a camp_username. */}
         <Route path="/:campUsername" element={<ProfilePage />} />
       </Route>

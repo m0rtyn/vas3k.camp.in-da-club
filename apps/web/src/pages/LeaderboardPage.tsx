@@ -24,12 +24,12 @@ export function LeaderboardPage() {
   return (
     <AuthGuard>
       <div className={styles.page}>
-        <div className={styles.title}>🏆 Рейтинг</div>
+        <div className={styles.title}>🏆 Либерборд</div>
 
         {isLoading ? (
           <div className={styles.loading}>Загрузка...</div>
         ) : entries.length === 0 ? (
-          <div className={styles.empty}>Пока нет данных для рейтинга</div>
+          <div className={styles.empty}>Пока нет знакомств подтверждённых у свидетелей</div>
         ) : (
           <div className={styles.list}>
             {entries.map((entry) => (

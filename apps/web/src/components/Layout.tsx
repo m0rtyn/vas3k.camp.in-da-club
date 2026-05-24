@@ -71,6 +71,13 @@ export function Layout() {
               </button>
               {showMenu && (
                 <div className={styles.menu}>
+                  <NavLink
+                    to="/about"
+                    className={styles.menuItem}
+                    onClick={() => setShowMenu(false)}
+                  >
+                    ℹ️ Как пользоваться
+                  </NavLink>
                   <button className={styles.menuItem} onClick={resetServiceWorker}>
                     🔄 Сбросить кэш
                   </button>
@@ -109,15 +116,15 @@ export function Layout() {
             </NavLink>
           </li>
           <li>
-            <NavLink to="/leaderboard" className={navLinkClass}>
-              <span className={styles.navIcon}>🏆</span>
-              Рейтинг
+            <NavLink to="/witness" className={navLinkClass}>
+              <span className={styles.navIcon}>👁️</span>
+              Свидетель
             </NavLink>
           </li>
           <li>
-            <NavLink to="/witness" className={navLinkClass}>
-              <span className={styles.navIcon}>👁</span>
-              Свидетель
+            <NavLink to="/leaderboard" className={navLinkClass}>
+              <span className={styles.navIcon}>🏆</span>
+              Рейтинг
             </NavLink>
           </li>
         </ul>
