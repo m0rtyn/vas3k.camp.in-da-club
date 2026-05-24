@@ -46,16 +46,74 @@ export function Layout() {
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     `${styles.navLink} ${isActive ? styles.navLinkActive : ''}`;
 
+  const [tapCount, setTapCount] = useState(0);
+  const [tapKey, setTapKey] = useState(0);
+  const [unlocked, setUnlocked] = useState(() => {
+    try { return localStorage.getItem('easter:13453x') === '1'; } catch { return false; }
+  });
+  const [glitching, setGlitching] = useState(false);
+  const [showSecret, setShowSecret] = useState(false);
+  const tapResetTimer = useRef<number | null>(null);
+
+  const handleLogoTap = () => {
+    setTapKey((k) => k + 1);
+    if (unlocked) return;
+    setTapCount((c) => {
+      const next = c + 1;
+      if (next >= 7) {
+        setGlitching(true);
+        setShowSecret(true);
+        try { localStorage.setItem('easter:13453x', '1'); } catch { /* ignore */ }
+        setUnlocked(true);
+        if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+          try { navigator.vibrate([30, 50, 30, 50, 100]); } catch { /* ignore */ }
+        }
+        window.setTimeout(() => setGlitching(false), 1500);
+        window.setTimeout(() => setShowSecret(false), 4500);
+        return 0;
+      }
+      return next;
+    });
+    if (tapResetTimer.current) window.clearTimeout(tapResetTimer.current);
+    tapResetTimer.current = window.setTimeout(() => setTapCount(0), 1500);
+  };
+
   return (
     <div className={styles.layout}>
       <header className={styles.header}>
-        <NavLink to="/" className={styles.logo}>
-          <span className={styles.logoFull}>Вастрик</span>
-          <span className={styles.logoShort}>Вас3к</span>
+        <NavLink
+          to="/"
+          className={`${styles.logo} ${glitching ? styles.logoGlitch : ''} ${unlocked ? styles.logoUnlocked : ''}`}
+          style={{ ['--tap-level' as string]: String(tapCount) } as React.CSSProperties}
+          onClick={handleLogoTap}
+        >
+          <span key={`a-${tapKey}`} className={styles.logoPulse}>
+            {unlocked ? (
+              '13453X'
+            ) : (
+              <>
+                <span className={styles.logoFull}>Вастрик</span>
+                <span className={styles.logoShort}>Вас3к</span>
+              </>
+            )}
+          </span>
           <Logo/>
-          <span className={styles.logoFull}>ВКлубе</span>
-          <span className={styles.logoShort}>ВК</span>
+          <span key={`b-${tapKey}`} className={styles.logoPulse}>
+            {unlocked ? (
+              null
+            ) : (
+              <>
+                <span className={styles.logoFull}>ВКлубе</span>
+                <span className={styles.logoShort}>ВК</span>
+              </>
+            )}
+          </span>
         </NavLink>
+        {showSecret && (
+          <div className={styles.secretToast} role="status" aria-live="polite">
+            👾 Secret unlocked
+          </div>
+        )}
         {user && (
           <div className={styles.headerUser}>
             {user.avatar_url && (
@@ -145,7 +203,6 @@ export function Layout() {
 
 export function Logo() {
   return (
-      // <span className={styles.logoSign}>✖︎</span>
       <span className={styles.logoSign}>+</span>
   );
 }
