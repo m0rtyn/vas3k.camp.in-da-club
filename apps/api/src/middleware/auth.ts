@@ -4,9 +4,11 @@ import { db } from '../db';
 import { users, sessions } from '../schema';
 import { eq, and, gt } from 'drizzle-orm';
 import { SESSION_COOKIE_NAME } from '../lib/session';
+import { generateAndAssignCampUsername } from '../lib/camp-username';
 
 export type AuthUser = {
   username: string;
+  camp_username: string;
   display_name: string;
   avatar_url: string;
   bio: string | null;
@@ -33,6 +35,7 @@ export async function authMiddleware(c: Context<Env>, next: Next) {
     const [row] = await db
       .select({
         username: users.username,
+        camp_username: users.camp_username,
         display_name: users.display_name,
         avatar_url: users.avatar_url,
         bio: users.bio,
@@ -46,7 +49,14 @@ export async function authMiddleware(c: Context<Env>, next: Next) {
       .limit(1);
 
     if (row) {
-      c.set('user', row);
+      const healed = await ensureCampUsername(row);
+      if (!healed) {
+        return c.json(
+          { error: 'server_error', message: 'Failed to assign camp_username' },
+          500,
+        );
+      }
+      c.set('user', healed);
       c.set('sessionId', sessionId);
       return next();
     }
@@ -62,10 +72,37 @@ export async function authMiddleware(c: Context<Env>, next: Next) {
       .limit(1);
 
     if (user) {
-      c.set('user', user);
+      const healed = await ensureCampUsername(user);
+      if (!healed) {
+        return c.json(
+          { error: 'server_error', message: 'Failed to assign camp_username' },
+          500,
+        );
+      }
+      c.set('user', healed);
       return next();
     }
   }
 
   return c.json({ error: 'unauthorized', message: 'Not authenticated' }, 401);
+}
+
+/**
+ * Ensure the user has a populated `camp_username`. If NULL (legacy row that
+ * slipped past OIDC/backfill), generate one inline. Returns a non-nullable
+ * `AuthUser`, or `null` if generation failed.
+ */
+async function ensureCampUsername(
+  row: { username: string; camp_username: string | null } & Omit<AuthUser, 'camp_username'>,
+): Promise<AuthUser | null> {
+  if (row.camp_username) {
+    return row as AuthUser;
+  }
+
+  const assigned = await generateAndAssignCampUsername(row.username);
+  if (!assigned) {
+    console.error('[authMiddleware] camp_username generation failed for', row.username);
+    return null;
+  }
+  return { ...row, camp_username: assigned };
 }

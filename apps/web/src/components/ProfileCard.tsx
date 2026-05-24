@@ -1,13 +1,25 @@
 import styles from './ProfileCard.module.css';
 
 interface ProfileCardProps {
+  /** Club slug — primary display identifier (@username) and vas3k.club deep-link. */
   username: string;
+  /** Camp username — shown only on the user's own profile so they know what's on their NFC chip. */
+  camp_username: string;
   display_name: string;
   avatar_url: string;
   bio?: string | null;
+  /** When true, the camp_username section is rendered. */
+  isOwnProfile?: boolean;
 }
 
-export function ProfileCard({ username, display_name, avatar_url, bio }: ProfileCardProps) {
+export function ProfileCard({
+  username,
+  camp_username,
+  display_name,
+  avatar_url,
+  bio,
+  isOwnProfile = false,
+}: ProfileCardProps) {
   return (
     <div className={styles.card}>
       {avatar_url ? (
@@ -26,6 +38,11 @@ export function ProfileCard({ username, display_name, avatar_url, bio }: Profile
       >
         @{username} ↗
       </a>
+      {isOwnProfile && (
+        <div className={styles.campUsername} title="Ваш ВКлубный юзернейм. Зашит в NFC-чипе.">
+          ВКлубный: <code>@{camp_username}</code>
+        </div>
+      )}
       {bio && <div className={styles.bio}>{bio}</div>}
     </div>
   );

@@ -15,6 +15,13 @@
       "when": 1779049504478,
       "tag": "0001_sessions_and_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779125686031,
+      "tag": "0002_smooth_adam_warlock",
+      "breakpoints": true
     }
   ]
 }

@@ -32,7 +32,7 @@ export function DashboardPage() {
   }
 
   const visibleMeetings = meetings.filter(
-    (m) => m.status !== 'cancelled' && !m.hidden_by?.includes(user.username),
+    (m) => m.status !== 'cancelled' && !m.is_hidden_by_me,
   );
   const confirmedCount = visibleMeetings.filter((m) => m.status === 'confirmed').length;
   const totalCount = visibleMeetings.length;

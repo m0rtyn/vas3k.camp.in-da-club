@@ -45,6 +45,20 @@
   text-decoration: underline;
 }
 
+.campUsername {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  padding: 6px 10px;
+  background: var(--color-bg);
+  border-radius: var(--radius-sm, 6px);
+  border: 1px dashed var(--color-border);
+}
+
+.campUsername code {
+  font-family: var(--font-mono, monospace);
+  color: var(--color-text);
+}
+
 .bio {
   color: var(--color-text-secondary);
   text-align: center;

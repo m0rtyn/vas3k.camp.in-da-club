@@ -42,15 +42,16 @@ app.use('/api/auth/me', authMiddleware);
 app.route('/api/auth', authRoutes);
 
 // --- Protected API routes (require auth) ---
-app.use('/api/meetings/*', authMiddleware);
-app.use('/api/meetings', authMiddleware);
+app.use('/api/meetings/*', authMiddleware, rateLimit('meetings', 60, 60_000));
+app.use('/api/meetings', authMiddleware, rateLimit('meetings', 60, 60_000));
 app.route('/api/meetings', meetingsRoutes);
 
 app.use('/api/witness/*', authMiddleware, rateLimit('witness', 10, 60_000));
 app.use('/api/witness', authMiddleware, rateLimit('witness', 10, 60_000));
 app.route('/api/witness', witnessRoutes);
 
-app.use('/api/users/*', authMiddleware);
+app.use('/api/users/*', authMiddleware, rateLimit('users', 60, 60_000));
+app.use('/api/users', authMiddleware, rateLimit('users', 60, 60_000));
 app.route('/api/users', usersRoutes);
 
 app.use('/api/leaderboard', authMiddleware);

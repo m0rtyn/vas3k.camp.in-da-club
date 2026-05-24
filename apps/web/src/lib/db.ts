@@ -7,13 +7,16 @@ interface VKlubeDB extends DBSchema {
     value: Meeting;
     indexes: {
       'by-status': string;
-      'by-initiator': string;
-      'by-target': string;
+      'by-initiator-camp': string;
+      'by-target-camp': string;
     };
   };
   users: {
     key: string;
     value: User;
+    indexes: {
+      'by-camp-username': string;
+    };
   };
   syncQueue: {
     key: number;
@@ -29,23 +32,32 @@ let dbInstance: IDBPDatabase<VKlubeDB> | null = null;
 export async function getDB(): Promise<IDBPDatabase<VKlubeDB>> {
   if (dbInstance) return dbInstance;
 
-  dbInstance = await openDB<VKlubeDB>('vklube', 1, {
-    upgrade(db) {
-      // Meetings store
-      const meetingStore = db.createObjectStore('meetings', { keyPath: 'id' });
-      meetingStore.createIndex('by-status', 'status');
-      meetingStore.createIndex('by-initiator', 'initiator_username');
-      meetingStore.createIndex('by-target', 'target_username');
+  dbInstance = await openDB<VKlubeDB>('vklube', 2, {
+    upgrade(db, oldVersion) {
+      if (oldVersion < 2) {
+        // Schema v2: switched to camp_username-based meeting and user lookups.
+        // Drop and recreate all stores; cached entries with the old shape are
+        // not compatible.
+        for (const name of ['meetings', 'users', 'syncQueue'] as const) {
+          if (db.objectStoreNames.contains(name)) {
+            db.deleteObjectStore(name);
+          }
+        }
 
-      // Users cache
-      db.createObjectStore('users', { keyPath: 'username' });
+        const meetingStore = db.createObjectStore('meetings', { keyPath: 'id' });
+        meetingStore.createIndex('by-status', 'status');
+        meetingStore.createIndex('by-initiator-camp', 'initiator_camp_username');
+        meetingStore.createIndex('by-target-camp', 'target_camp_username');
 
-      // Sync queue
-      const syncStore = db.createObjectStore('syncQueue', {
-        keyPath: 'id',
-        autoIncrement: true,
-      });
-      syncStore.createIndex('by-synced', 'synced');
+        const userStore = db.createObjectStore('users', { keyPath: 'username' });
+        userStore.createIndex('by-camp-username', 'camp_username');
+
+        const syncStore = db.createObjectStore('syncQueue', {
+          keyPath: 'id',
+          autoIncrement: true,
+        });
+        syncStore.createIndex('by-synced', 'synced');
+      }
     },
   });
 
@@ -84,6 +96,11 @@ export async function saveUser(user: User): Promise<void> {
 export async function getUser(username: string): Promise<User | undefined> {
   const db = await getDB();
   return db.get('users', username);
+}
+
+export async function getUserByCampUsername(campUsername: string): Promise<User | undefined> {
+  const db = await getDB();
+  return db.getFromIndex('users', 'by-camp-username', campUsername);
 }
 
 // --- Sync queue ---

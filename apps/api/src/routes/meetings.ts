@@ -2,23 +2,38 @@ import { Hono } from 'hono';
 import { db } from '../db';
 import { meetings, users } from '../schema';
 import { eq, or, and, ne, sql, desc } from 'drizzle-orm';
-import { CANCEL_WINDOW_MS, WITNESS_CODE_DURATION_MS, WITNESS_CODE_LENGTH, CONTACTS_PER_APPROVAL } from '@vklube/shared';
+import { CANCEL_WINDOW_MS, WITNESS_CODE_DURATION_MS, WITNESS_CODE_LENGTH, CONTACTS_PER_APPROVAL, MAX_CAMP_USERNAME_LEN } from '@vklube/shared';
 import type { AppEnv } from '../types';
+import { meetingProjection, getProjectedMeeting } from '../lib/projections';
+import { resolveCampUsernameToSlug } from '../lib/camp-username';
 
 const meetingsRouter = new Hono<AppEnv>();
 
 /**
- * POST /api/meetings — Create a new meeting
+ * POST /api/meetings — Create a new meeting.
+ *
+ * Accepts `target_camp_username` on the wire; resolves it to the underlying
+ * club slug (users.username) before persisting the FK.
  */
 meetingsRouter.post('/', async (c) => {
   const user = c.get('user');
-  const { target_username, client_created_at } = await c.req.json<{
-    target_username: string;
+  const { target_camp_username, client_created_at } = await c.req.json<{
+    target_camp_username: string;
     client_created_at: string;
   }>();
 
-  if (!target_username || !client_created_at) {
-    return c.json({ error: 'bad_request', message: 'target_username and client_created_at are required' }, 400);
+  if (!target_camp_username || !client_created_at) {
+    return c.json({ error: 'bad_request', message: 'target_camp_username and client_created_at are required' }, 400);
+  }
+
+  if (target_camp_username.length > MAX_CAMP_USERNAME_LEN) {
+    return c.json({ error: 'bad_request', message: 'target_camp_username too long' }, 400);
+  }
+
+  // Resolve target camp_username → slug
+  const target_username = await resolveCampUsernameToSlug(target_camp_username);
+  if (!target_username) {
+    return c.json({ error: 'not_found', message: 'Target user not found' }, 404);
   }
 
   // Can't meet yourself
@@ -26,20 +41,9 @@ meetingsRouter.post('/', async (c) => {
     return c.json({ error: 'bad_request', message: 'Cannot create a meeting with yourself' }, 400);
   }
 
-  // Check target exists
-  const [target] = await db
-    .select()
-    .from(users)
-    .where(eq(users.username, target_username))
-    .limit(1);
-
-  if (!target) {
-    return c.json({ error: 'not_found', message: 'Target user not found' }, 404);
-  }
-
   // Check if pair already has an active meeting (bidirectional)
   const existing = await db
-    .select()
+    .select(meetingProjection(user.username))
     .from(meetings)
     .where(
       and(
@@ -67,7 +71,7 @@ meetingsRouter.post('/', async (c) => {
   }
 
   // Create meeting
-  const [meeting] = await db
+  const [inserted] = await db
     .insert(meetings)
     .values({
       initiator_username: user.username,
@@ -75,7 +79,9 @@ meetingsRouter.post('/', async (c) => {
       status: 'unconfirmed',
       client_created_at: new Date(client_created_at),
     })
-    .returning();
+    .returning({ id: meetings.id });
+
+  const meeting = await getProjectedMeeting(db, inserted.id, user.username);
 
   return c.json(meeting, 201);
 });
@@ -108,7 +114,7 @@ meetingsRouter.get('/', async (c) => {
   }
 
   const result = await db
-    .select()
+    .select(meetingProjection(user.username))
     .from(meetings)
     .where(and(...conditions))
     .orderBy(desc(meetings.created_at));
@@ -123,7 +129,7 @@ meetingsRouter.get('/witnessed', async (c) => {
   const user = c.get('user');
 
   const result = await db
-    .select()
+    .select(meetingProjection(user.username))
     .from(meetings)
     .where(
       and(
@@ -143,11 +149,7 @@ meetingsRouter.get('/:id', async (c) => {
   const user = c.get('user');
   const meetingId = c.req.param('id');
 
-  const [meeting] = await db
-    .select()
-    .from(meetings)
-    .where(eq(meetings.id, meetingId))
-    .limit(1);
+  const meeting = await getProjectedMeeting(db, meetingId, user.username);
 
   if (!meeting) {
     return c.json({ error: 'not_found', message: 'Meeting not found' }, 404);
@@ -196,14 +198,15 @@ meetingsRouter.post('/:id/cancel', async (c) => {
   }
 
   // Hard delete — set status to cancelled
-  const [cancelled] = await db
+  await db
     .update(meetings)
     .set({
       status: 'cancelled',
       cancelled_at: new Date(),
     })
-    .where(eq(meetings.id, meetingId))
-    .returning();
+    .where(eq(meetings.id, meetingId));
+
+  const cancelled = await getProjectedMeeting(db, meetingId, user.username);
 
   return c.json(cancelled);
 });
@@ -239,7 +242,8 @@ meetingsRouter.post('/:id/request-witness', async (c) => {
   if (meeting.witness_code && meeting.witness_code_expires_at) {
     const expiresAt = new Date(meeting.witness_code_expires_at).getTime();
     if (expiresAt > Date.now()) {
-      return c.json(meeting);
+      const projected = await getProjectedMeeting(db, meetingId, user.username);
+      return c.json(projected);
     }
   }
 
@@ -247,15 +251,16 @@ meetingsRouter.post('/:id/request-witness', async (c) => {
   const code = String(Math.floor(Math.random() * 10 ** WITNESS_CODE_LENGTH)).padStart(WITNESS_CODE_LENGTH, '0');
   const expiresAt = new Date(Date.now() + WITNESS_CODE_DURATION_MS);
 
-  const [updated] = await db
+  await db
     .update(meetings)
     .set({
       witness_code: code,
       witness_code_expires_at: expiresAt,
       status: 'pending',
     })
-    .where(eq(meetings.id, meetingId))
-    .returning();
+    .where(eq(meetings.id, meetingId));
+
+  const updated = await getProjectedMeeting(db, meetingId, user.username);
 
   return c.json(updated);
 });

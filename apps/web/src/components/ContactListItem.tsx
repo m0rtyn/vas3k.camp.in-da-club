@@ -4,6 +4,7 @@ import styles from './ContactListItem.module.css';
 
 interface ContactListItemProps {
   meeting: Meeting;
+  /** Current user's club slug (used to figure out which side is "the other"). */
   currentUsername: string;
   onCancel?: (meetingId: string) => void;
 }
@@ -13,10 +14,12 @@ export function ContactListItem({
   currentUsername,
   onCancel,
 }: ContactListItemProps) {
-  const otherUsername =
-    meeting.initiator_username === currentUsername
-      ? meeting.target_username
-      : meeting.initiator_username;
+  const isInitiator = meeting.initiator_username === currentUsername;
+  const otherUsername = isInitiator ? meeting.target_username : meeting.initiator_username;
+  // Camp username is used as the route target so URLs/NFC remain unguessable.
+  const otherCampUsername = isInitiator
+    ? meeting.target_camp_username
+    : meeting.initiator_camp_username;
 
   const isConfirmed = meeting.status === 'confirmed';
   const date = new Date(meeting.created_at).toLocaleDateString('ru-RU', {
@@ -35,7 +38,7 @@ export function ContactListItem({
         {otherUsername.charAt(0).toUpperCase()}
       </div>
 
-      <Link to={`/${otherUsername}`} className={styles.info}>
+      <Link to={`/${otherCampUsername}`} className={styles.info}>
         <div className={styles.name}>@{otherUsername}</div>
         <div className={styles.meta}>
           <span>{date}</span>

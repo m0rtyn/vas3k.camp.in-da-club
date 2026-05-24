@@ -29,8 +29,8 @@ export function App() {
         <Route path="/leaderboard" element={<LeaderboardPage />} />
         <Route path="/witness" element={<WitnessPage />} />
         <Route path="/admin" element={<AdminPage />} />
-        {/* Catch-all: NFC landing or own profile */}
-        <Route path="/:username" element={<ProfilePage />} />
+        {/* Catch-all: NFC landing or own profile. Param value is a camp_username. */}
+        <Route path="/:campUsername" element={<ProfilePage />} />
       </Route>
     </Routes>
     </ErrorBoundary>

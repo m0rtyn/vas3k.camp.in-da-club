@@ -19,3 +19,7 @@ Thumbs.db
 
 # Build
 *.tsbuildinfo
+
+# Personal data — participant lists
+participants.md
+participants.*.md

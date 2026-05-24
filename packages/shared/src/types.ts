@@ -2,6 +2,7 @@ export type MeetingStatus = 'pending' | 'unconfirmed' | 'confirmed' | 'cancelled
 
 export interface User {
   username: string;
+  camp_username: string;
   display_name: string;
   avatar_url: string;
   bio: string | null;
@@ -13,13 +14,23 @@ export interface User {
 
 export interface Meeting {
   id: string;
+  /** Club slug (vas3k.club username) of the meeting initiator. Used for display. */
   initiator_username: string;
+  /** Camp username of the meeting initiator. Used in URLs / NFC chips. */
+  initiator_camp_username: string;
+  /** Club slug of the meeting target. */
   target_username: string;
+  /** Camp username of the meeting target. */
+  target_camp_username: string;
   witness_code: string | null;
   witness_code_expires_at: string | null;
+  /** Club slug of the witness, if any. */
   witness_username: string | null;
+  /** Camp username of the witness, if any. */
+  witness_camp_username: string | null;
   status: MeetingStatus;
-  hidden_by: string[];
+  /** Whether the current user has hidden this meeting from their view. */
+  is_hidden_by_me: boolean;
   created_at: string;
   confirmed_at: string | null;
   cancelled_at: string | null;
@@ -51,7 +62,7 @@ export interface SyncQueueItem {
 
 export interface LeaderboardEntry {
   rank: number;
-  username: string | null;
+  camp_username: string | null;
   display_name: string | null;
   avatar_url: string | null;
   confirmed_count: number;
@@ -59,7 +70,7 @@ export interface LeaderboardEntry {
 }
 
 export interface CreateMeetingPayload {
-  target_username: string;
+  target_camp_username: string;
   client_created_at: string;
 }
 

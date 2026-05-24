@@ -36,6 +36,7 @@ leaderboard.get('/', async (c) => {
       r.rank,
       r.username,
       r.confirmed_count,
+      u.camp_username,
       u.display_name,
       u.avatar_url
     FROM ranked r
@@ -47,25 +48,25 @@ leaderboard.get('/', async (c) => {
     rank: number;
     username: string;
     confirmed_count: number;
+    camp_username: string | null;
     display_name: string;
     avatar_url: string;
   }>;
 
-  const entries = rows.map((row) => ({
-    rank: Number(row.rank),
-    confirmed_count: Number(row.confirmed_count),
-    is_self: row.username === currentUser?.username,
-    // Only reveal identity for top N or self
-    username: Number(row.rank) <= LEADERBOARD_VISIBLE_TOP || row.username === currentUser?.username
-      ? row.username
-      : null,
-    display_name: Number(row.rank) <= LEADERBOARD_VISIBLE_TOP || row.username === currentUser?.username
-      ? row.display_name
-      : null,
-    avatar_url: Number(row.rank) <= LEADERBOARD_VISIBLE_TOP || row.username === currentUser?.username
-      ? row.avatar_url
-      : null,
-  }));
+  const entries = rows.map((row) => {
+    const isSelf = row.username === currentUser?.username;
+    const reveal = Number(row.rank) <= LEADERBOARD_VISIBLE_TOP || isSelf;
+    return {
+      rank: Number(row.rank),
+      confirmed_count: Number(row.confirmed_count),
+      is_self: isSelf,
+      // Only reveal identity for top N or self. The club slug (row.username)
+      // is never returned to the client.
+      camp_username: reveal ? row.camp_username : null,
+      display_name: reveal ? row.display_name : null,
+      avatar_url: reveal ? row.avatar_url : null,
+    };
+  });
 
   return c.json(entries);
 });

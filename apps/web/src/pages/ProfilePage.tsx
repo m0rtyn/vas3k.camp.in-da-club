@@ -3,31 +3,31 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from '../store/auth';
 import { useMeetingsStore } from '../store/meetings';
 import { api } from '../lib/api';
-import { getUser, saveUser } from '../lib/db';
+import { getUserByCampUsername, saveUser } from '../lib/db';
 import { ProfileCard } from '../components/ProfileCard';
 import { MeetButton } from '../components/MeetButton';
 import type { User } from '@vklube/shared';
 import styles from './ProfilePage.module.css';
 
 export function ProfilePage() {
-  const { username } = useParams<{ username: string }>();
+  const { campUsername } = useParams<{ campUsername: string }>();
   const { user: currentUser } = useAuthStore();
   const { fetchMeetings } = useMeetingsStore();
   const [profile, setProfile] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const isOwnProfile = currentUser?.username === username;
+  const isOwnProfile = currentUser?.camp_username === campUsername;
 
   useEffect(() => {
-    if (!username) return;
+    if (!campUsername) return;
 
     const loadProfile = async () => {
       setIsLoading(true);
       setError(null);
 
       // Try IndexedDB cache first
-      const cached = await getUser(username);
+      const cached = await getUserByCampUsername(campUsername);
       if (cached) {
         setProfile(cached);
         setIsLoading(false);
@@ -36,7 +36,7 @@ export function ProfilePage() {
       // Fetch from API if online
       if (navigator.onLine) {
         try {
-          const data = await api.get<User>(`/users/${username}`);
+          const data = await api.get<User>(`/users/${campUsername}`);
           await saveUser(data);
           setProfile(data);
         } catch {
@@ -53,7 +53,7 @@ export function ProfilePage() {
 
     loadProfile();
     fetchMeetings();
-  }, [username, fetchMeetings]);
+  }, [campUsername, fetchMeetings]);
 
   if (isLoading && !profile) {
     return <div className={styles.loading}>Загрузка...</div>;
@@ -67,15 +67,20 @@ export function ProfilePage() {
     <div className={styles.page}>
       <ProfileCard
         username={profile.username}
+        camp_username={profile.camp_username}
         display_name={profile.display_name}
         avatar_url={profile.avatar_url}
         bio={profile.bio}
+        isOwnProfile={isOwnProfile}
       />
 
       {isOwnProfile ? (
         <div className={styles.ownProfileBadge}>Это ваш профиль</div>
       ) : (
-        <MeetButton targetUsername={profile.username} />
+        <MeetButton
+          targetUsername={profile.username}
+          targetCampUsername={profile.camp_username}
+        />
       )}
     </div>
   );

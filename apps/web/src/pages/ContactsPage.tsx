@@ -17,7 +17,7 @@ export function ContactsPage() {
   }, [fetchMeetings]);
 
   const visible = meetings.filter(
-    (m) => m.status !== 'cancelled' && !(user && m.hidden_by?.includes(user.username)),
+    (m) => m.status !== 'cancelled' && !m.is_hidden_by_me,
   );
 
   const filtered = visible.filter((m) => {
