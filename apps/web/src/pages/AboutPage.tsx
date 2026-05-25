@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { INITIAL_APPROVALS, CONTACTS_PER_APPROVAL } from '@vklube/shared';
+import { INITIAL_APPROVALS, CONTACTS_PER_APPROVAL, APPROVALS_HINT } from '@vklube/shared';
 import { Hint } from '../components/Hint';
 import styles from './AboutPage.module.css';
 
@@ -90,7 +90,7 @@ export function AboutPage() {
                 <Hint label={<>Любой</>}>
                   Ну почти: у всех есть{' '}
                   <Hint label={<>«апрувы»</>}>
-                  Апрувы тратит свидетель, а не ты. Всем на старте выдаётся по {INITIAL_APPROVALS} апрувов, а затем по одному за каждые {CONTACTS_PER_APPROVAL} новых знакомства — обоим участникам встречи.
+                  {APPROVALS_HINT}
                   </Hint> и они ограничены, особенно если не заводить новых контактов.
                 </Hint>{' '}
                 третий кэмпер открывает вкладку{' '}

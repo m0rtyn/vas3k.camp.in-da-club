@@ -23,16 +23,20 @@
 }
 
 .balance {
-  font-size: 14px;
+  font-size: 1.2em;
   color: var(--color-text-secondary);
   padding: 8px 16px;
   background: var(--color-surface);
   border-radius: 8px;
+  display: flex;
+  align-items: center;
 }
 
 .balanceCount {
   font-weight: 700;
+  font-size: 1.3rem;
   color: var(--color-text);
+  padding: 0.3em;
 }
 
 .codeInputs {

@@ -31,9 +31,21 @@ export function Hint({ label, children }: { label: ReactNode; children: ReactNod
     };
   }, []);
 
+  const isEmptyLabel =
+    label === '' || label === null || label === undefined || label === false;
+
   return (
     <details ref={ref} className={styles.hint}>
-      <summary className={styles.hintTrigger}>{label}</summary>
+      <summary
+        className={`${styles.hintTrigger} ${isEmptyLabel ? styles.hintTriggerIconOnly : ''}`}
+        aria-label={isEmptyLabel ? 'Подсказка' : undefined}
+      >
+        {isEmptyLabel ? (
+          <span className={styles.hintIcon} aria-hidden="true">i</span>
+        ) : (
+          label
+        )}
+      </summary>
       <span className={styles.hintBody}>{children}</span>
     </details>
   );

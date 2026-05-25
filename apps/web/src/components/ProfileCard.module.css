@@ -60,6 +60,37 @@
   color: var(--color-text);
 }
 
+.copyButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  padding: 0 0.3em;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border-radius: var(--radius-sm, 6px);
+  transition: opacity 0.15s ease;
+  text-decoration: dashed underline;
+}
+
+.copyButton:hover,
+.copyButton:focus-visible {
+  opacity: 0.75;
+  outline: none;
+}
+
+.copyButton:active {
+  opacity: 0.5;
+}
+
+.copyHint {
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+
 .bio {
   color: var(--color-text-secondary);
   text-align: center;

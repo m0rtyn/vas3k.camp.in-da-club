@@ -2,8 +2,9 @@ import { useState, useRef, useEffect } from 'react';
 import { useAuthStore } from '../store/auth';
 import { useMeetingsStore } from '../store/meetings';
 import { api } from '../lib/api';
-import type { Meeting } from '@vklube/shared';
+import { APPROVALS_HINT, type Meeting } from '@vklube/shared';
 import styles from './WitnessPage.module.css';
+import { Hint } from '@/components/Hint';
 
 export function WitnessPage() {
   const { user } = useAuthStore();
@@ -127,7 +128,10 @@ export function WitnessPage() {
       </div>
 
       <div className={styles.balance}>
-        Доступно апрувов: <span className={styles.balanceCount}>{approvals}</span>
+        Доступно апрувов {' '}
+        <Hint label="">
+          {APPROVALS_HINT}
+        </Hint>: <span className={styles.balanceCount}>{approvals}</span>
       </div>
 
       <div className={styles.codeInputs} onPaste={handlePaste}>

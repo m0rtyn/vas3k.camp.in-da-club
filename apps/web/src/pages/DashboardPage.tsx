@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { INITIAL_APPROVALS, CONTACTS_PER_APPROVAL } from '@vklube/shared';
+import { INITIAL_APPROVALS, APPROVALS_HINT, CONTACTS_PER_APPROVAL } from '@vklube/shared';
 import { useAuthStore } from '../store/auth';
 import { useMeetingsStore } from '../store/meetings';
 import { ContactListItem } from '../components/ContactListItem';
@@ -59,8 +59,7 @@ export function DashboardPage() {
           <div className={styles.statNumber}>{user.approvals_available}</div>
           <div className={styles.statLabel}>
             <Hint label="Апрувов">
-              Апрувы нужны на подтверждение контактов. Их тратит свидетель. Всем на старте выдаётся по {INITIAL_APPROVALS} апрувов,
-              а затем по одному за каждые {CONTACTS_PER_APPROVAL} новых знакомства — обоим участникам встречи.
+              {APPROVALS_HINT}
             </Hint>
           </div>
         </div>
