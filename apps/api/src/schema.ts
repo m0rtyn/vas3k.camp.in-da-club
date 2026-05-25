@@ -31,7 +31,7 @@ export const users = pgTable(
     display_name: text('display_name').notNull(),
     avatar_url: text('avatar_url').notNull().default(''),
     bio: text('bio'),
-    approvals_available: integer('approvals_available').notNull().default(3),
+    approvals_available: integer('approvals_available').notNull().default(5),
     confirmed_contacts_count: integer('confirmed_contacts_count').notNull().default(0),
     is_admin: boolean('is_admin').notNull().default(false),
     created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),

@@ -1,5 +1,5 @@
 /** Number of approvals each user starts with */
-export const INITIAL_APPROVALS = 3;
+export const INITIAL_APPROVALS = 5;
 
 /** How many confirmed contacts to earn +1 approval */
 export const CONTACTS_PER_APPROVAL = 2;

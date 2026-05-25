@@ -1,3 +1,4 @@
+import { Hint } from './Hint';
 import styles from './ProfileCard.module.css';
 
 interface ProfileCardProps {
@@ -30,6 +31,8 @@ export function ProfileCard({
         </div>
       )}
       <div className={styles.name}>{display_name}</div>
+      <span>
+      Клубный профиль:{' '}
       <a
         href={`https://vas3k.club/user/${username}/`}
         target="_blank"
@@ -38,9 +41,12 @@ export function ProfileCard({
       >
         @{username} ↗
       </a>
+      </span>
       {isOwnProfile && (
-        <div className={styles.campUsername} title="Ваш ВКлубный юзернейм. Зашит в NFC-чипе.">
-          ВКлубный: <code>@{camp_username}</code>
+        <div className={styles.campUsername} title="">
+          <Hint label="Твой юзернейм:">
+            Твой юзернейм. Используется для добавления в контакты. Зашит в NFC-чипе.
+          </Hint> <code>@{camp_username}</code>
         </div>
       )}
       {bio && <div className={styles.bio}>{bio}</div>}

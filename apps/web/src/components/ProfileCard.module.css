@@ -47,11 +47,12 @@
 
 .campUsername {
   color: var(--color-text-secondary);
-  font-size: 13px;
+  font-size: 1.2rem;
   padding: 6px 10px;
   background: var(--color-bg);
   border-radius: var(--radius-sm, 6px);
   border: 1px dashed var(--color-border);
+  cursor: help;
 }
 
 .campUsername code {

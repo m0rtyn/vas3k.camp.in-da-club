@@ -75,7 +75,7 @@ export function ProfilePage() {
       />
 
       {isOwnProfile ? (
-        <div className={styles.ownProfileBadge}>Это ваш профиль</div>
+        <div className={styles.ownProfileBadge}>Это твой профиль</div>
       ) : (
         <MeetButton
           targetUsername={profile.username}

@@ -116,14 +116,34 @@ export function Layout() {
         )}
         {user && (
           <div className={styles.headerUser}>
-            {user.avatar_url && (
-              <img
-                src={user.avatar_url}
-                alt={user.display_name}
-                className={styles.headerAvatar}
-              />
+            {user.camp_username ? (
+              <NavLink
+                to={`/${user.camp_username}`}
+                className={styles.headerUserLink}
+                aria-label="Мой профиль"
+                title="Мой профиль"
+              >
+                {user.avatar_url && (
+                  <img
+                    src={user.avatar_url}
+                    alt={user.display_name}
+                    className={styles.headerAvatar}
+                  />
+                )}
+                <span className={styles.headerName}>{user.display_name}</span>
+              </NavLink>
+            ) : (
+              <>
+                {user.avatar_url && (
+                  <img
+                    src={user.avatar_url}
+                    alt={user.display_name}
+                    className={styles.headerAvatar}
+                  />
+                )}
+                <span className={styles.headerName}>{user.display_name}</span>
+              </>
             )}
-            <span className={styles.headerName}>{user.display_name}</span>
 
             <div className={styles.headerMenu}>
               <NavLink
