@@ -12,6 +12,7 @@ import usersRoutes from './routes/users';
 import leaderboardRoutes from './routes/leaderboard';
 import adminRoutes from './routes/admin';
 import syncRoutes from './routes/sync';
+import recapRoutes from './routes/recap';
 import { db } from './db';
 
 const app = new Hono();
@@ -56,6 +57,9 @@ app.route('/api/users', usersRoutes);
 
 app.use('/api/leaderboard', authMiddleware);
 app.route('/api/leaderboard', leaderboardRoutes);
+
+app.use('/api/recap/*', authMiddleware, rateLimit('recap', 30, 60_000));
+app.route('/api/recap', recapRoutes);
 
 app.use('/api/sync', authMiddleware);
 app.route('/api/sync', syncRoutes);

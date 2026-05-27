@@ -1,0 +1,38 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.loading {
+  text-align: center;
+  padding: 64px 16px;
+  color: var(--color-text-secondary);
+}
+
+.locked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 64px 16px;
+  gap: 12px;
+}
+
+.lockedEmoji {
+  font-size: 64px;
+}
+
+.lockedTitle {
+  font-size: clamp(24px, 5vw, 36px);
+  font-weight: 800;
+  margin: 0;
+}
+
+.lockedText {
+  color: var(--color-text-secondary);
+  max-width: 480px;
+  margin: 0;
+}

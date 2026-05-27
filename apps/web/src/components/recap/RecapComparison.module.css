@@ -1,0 +1,88 @@
+.section {
+  padding: 32px 0;
+}
+
+.title {
+  font-size: clamp(24px, 4vw, 32px);
+  font-weight: 800;
+  margin: 0 0 8px;
+}
+
+.subtitle {
+  color: var(--color-text-secondary);
+  margin: 0 0 24px;
+}
+
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 80px 1fr 56px;
+  align-items: center;
+  gap: 12px;
+}
+
+.rowLabel {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.rowValue {
+  font-size: 14px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.barTrack {
+  height: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  background: color-mix(in srgb, var(--color-accent) 50%, var(--color-text));
+  border-radius: 999px;
+  transition: width 0.6s ease-out;
+}
+
+.barFillMe {
+  background: var(--color-accent);
+}
+
+.callout {
+  padding: 16px;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  font-size: 15px;
+}
+
+.skeleton {
+  height: 12px;
+  background: var(--color-surface);
+  border-radius: 999px;
+  margin-bottom: 12px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.offline {
+  padding: 16px;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  border: 1px dashed var(--color-border);
+  color: var(--color-text-secondary);
+  text-align: center;
+}

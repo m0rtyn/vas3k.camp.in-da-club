@@ -9,6 +9,8 @@ import { ProfilePage } from './pages/ProfilePage';
 import { ContactsPage } from './pages/ContactsPage';
 import { LeaderboardPage } from './pages/LeaderboardPage';
 import { WitnessPage } from './pages/WitnessPage';
+import { RecapPage } from './pages/RecapPage';
+import { RecapPreviewPage } from './pages/RecapPreviewPage';
 import { AdminPage } from './pages/AdminPage';
 import { AboutPage } from './pages/AboutPage';
 import { LoginPage } from './pages/LoginPage';
@@ -28,6 +30,8 @@ export function App() {
         <Route path="/" element={<DashboardPage />} />
         <Route path="/contacts" element={<ContactsPage />} />
         <Route path="/leaderboard" element={<LeaderboardPage />} />
+        <Route path="/recap" element={<RecapPage />} />
+        <Route path="/recap/preview" element={<RecapPreviewPage />} />
         <Route path="/witness" element={<WitnessPage />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/about" element={<AboutPage />} />

@@ -1,5 +1,6 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
+import { isCampOver } from '@vklube/shared';
 import { useAuthStore } from '../store/auth';
 import { useSyncStore } from '../store/sync';
 import { usePwaStore } from '../store/pwa';
@@ -45,6 +46,8 @@ export function Layout() {
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     `${styles.navLink} ${isActive ? styles.navLinkActive : ''}`;
+
+  const campOver = isCampOver();
 
   const [tapCount, setTapCount] = useState(0);
   const [tapKey, setTapKey] = useState(0);
@@ -152,7 +155,7 @@ export function Layout() {
                 title="Как пользоваться"
                 aria-label="Как пользоваться"
               >
-                ℹ️
+                ℹ️ Что это?
               </NavLink>
               <div className={styles.menuWrapper} ref={menuRef}>
                 <button
@@ -214,6 +217,23 @@ export function Layout() {
               <span className={styles.navIcon}>🏆</span>
               Рейтинг
             </NavLink>
+          </li>
+          <li>
+            {campOver ? (
+              <NavLink to="/recap" className={navLinkClass}>
+                <span className={styles.navIcon}>📊</span>
+                Итоги
+              </NavLink>
+            ) : (
+              <span
+                className={`${styles.navLink} ${styles.navLinkDisabled}`}
+                aria-disabled="true"
+                title="Откроется после кэмпа"
+              >
+                <span className={styles.navIcon}>🔒</span>
+                Итоги
+              </span>
+            )}
           </li>
         </ul>
       </nav>

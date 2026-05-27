@@ -1,0 +1,47 @@
+.section {
+  padding: 32px 0;
+}
+
+.title {
+  font-size: clamp(24px, 4vw, 32px);
+  font-weight: 800;
+  margin: 0 0 8px;
+}
+
+.subtitle {
+  color: var(--color-text-secondary);
+  margin: 0 0 24px;
+}
+
+.graphWrap {
+  max-width: 480px;
+  margin: 0 auto;
+  aspect-ratio: 1;
+}
+
+.svg {
+  display: block;
+}
+
+.edge {
+  stroke: color-mix(in srgb, var(--color-accent) 35%, transparent);
+  stroke-width: 1.2;
+}
+
+.egoNode {
+  fill: var(--color-accent);
+  stroke: var(--color-surface);
+  stroke-width: 3;
+}
+
+.node {
+  fill: color-mix(in srgb, var(--color-accent) 75%, var(--color-text));
+  stroke: var(--color-surface);
+  stroke-width: 2;
+}
+
+.empty {
+  color: var(--color-text-secondary);
+  text-align: center;
+  padding: 24px 0;
+}
