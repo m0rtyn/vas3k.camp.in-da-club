@@ -1,0 +1,13 @@
+.banner {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  margin: -16px -16px 8px;
+  padding: 10px 16px;
+  background: color-mix(in srgb, var(--color-accent) 25%, var(--color-surface));
+  border-bottom: 1px solid var(--color-accent);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  color: var(--color-text);
+}

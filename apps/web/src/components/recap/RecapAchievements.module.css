@@ -1,0 +1,101 @@
+.section {
+  padding: 32px 0;
+}
+
+.title {
+  font-size: clamp(24px, 4vw, 32px);
+  font-weight: 800;
+  margin: 0 0 16px;
+}
+
+.subtitle {
+  color: var(--color-text-secondary);
+  margin: 0 0 12px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.card {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  align-items: flex-start;
+  opacity: 0.7;
+}
+
+.cardEarned {
+  opacity: 1;
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface));
+}
+
+.cardGlobal::after {
+  content: '★';
+  position: absolute;
+}
+
+.cardBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.emoji {
+  font-size: 32px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.cardTitle {
+  font-weight: 700;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  background: var(--color-accent);
+  color: var(--color-surface);
+  border-radius: 999px;
+  letter-spacing: 0.05em;
+}
+
+.cardDesc {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+.cardValue {
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+.holder {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.empty {
+  color: var(--color-text-secondary);
+  text-align: center;
+  padding: 24px 0;
+}

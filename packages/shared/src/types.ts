@@ -78,3 +78,40 @@ export interface ApiError {
   error: string;
   message: string;
 }
+
+/** Holder of a global achievement (single winner). */
+export interface AchievementHolder {
+  username: string;
+  camp_username: string | null;
+  display_name: string;
+  avatar_url: string | null;
+}
+
+/** Camp-wide aggregate stats + global single-winner achievements. */
+export interface RecapStats {
+  /** Median of confirmed contacts per participant (who has >=1 meeting). */
+  median: number;
+  /** Arithmetic mean of confirmed contacts per participant. */
+  mean: number;
+  p25: number;
+  p75: number;
+  p90: number;
+  /** Number of participants with at least one confirmed meeting. */
+  total_participants: number;
+  /** Total confirmed meetings across the camp. */
+  total_meetings: number;
+  global_achievements: {
+    /** First confirmed meeting of the camp. */
+    first_meeting:
+      | {
+          initiator: AchievementHolder;
+          target: AchievementHolder;
+          confirmed_at: string;
+        }
+      | null;
+    /** User with the most confirmed meetings. */
+    top_networker: (AchievementHolder & { count: number }) | null;
+    /** User who acted as witness the most times. */
+    top_witness: (AchievementHolder & { count: number }) | null;
+  };
+}

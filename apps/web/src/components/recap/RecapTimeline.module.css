@@ -1,0 +1,61 @@
+.section {
+  padding: 32px 0;
+}
+
+.title {
+  font-size: clamp(24px, 4vw, 32px);
+  font-weight: 800;
+  margin: 0 0 8px;
+}
+
+.subtitle {
+  color: var(--color-text-secondary);
+  margin: 0 0 24px;
+}
+
+.chartWrap {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.grid {
+  stroke: var(--color-border);
+  stroke-dasharray: 2 4;
+  stroke-width: 1;
+}
+
+.tickText {
+  font-size: 11px;
+  fill: var(--color-text-secondary);
+  font-family: inherit;
+}
+
+.area {
+  fill: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  stroke: none;
+}
+
+.line {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.dot {
+  fill: var(--color-accent);
+}
+
+.empty {
+  color: var(--color-text-secondary);
+  text-align: center;
+  padding: 24px 0;
+}
