@@ -21,6 +21,14 @@ export const LEADERBOARD_VISIBLE_TOP = 20;
 /** Camp timezone for time-based achievements */
 export const CAMP_TIMEZONE = 'Europe/Belgrade';
 
+/**
+ * Camp start/end (ISO 8601, UTC).
+ * TODO: replace placeholders with exact dates before release.
+ * Used for gating the Recap page and time-based logic.
+ */
+export const CAMP_START_DATE = '2026-05-28T10:00:00+02:00';
+export const CAMP_END_DATE = '2026-06-01T15:00:00+02:00';
+
 /** App name */
 export const APP_NAME = 'ВКлубе';
 

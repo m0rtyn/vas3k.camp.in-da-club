@@ -52,6 +52,17 @@
   color: var(--color-accent);
 }
 
+.navLinkDisabled {
+  color: var(--color-text-secondary);
+  opacity: 0.55;
+  cursor: not-allowed;
+  user-select: none;
+}
+
+.navLinkDisabled:hover {
+  color: var(--color-text-secondary);
+}
+
 .navIcon {
   font-size: 20px;
 }
