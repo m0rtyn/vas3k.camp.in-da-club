@@ -4,6 +4,7 @@ import { useMeetingsStore } from '../store/meetings';
 import { ContactListItem } from '../components/ContactListItem';
 import { AuthGuard } from '../components/AuthGuard';
 import styles from './ContactsPage.module.css';
+import { Link } from 'react-router-dom';
 
 type Filter = 'all' | 'confirmed' | 'unconfirmed';
 
@@ -40,7 +41,7 @@ export function ContactsPage() {
             >
               {f === 'all' && `Все (${visible.length})`}
               {f === 'confirmed' && `Подтверждённые (${visible.filter((m) => m.status === 'confirmed').length})`}
-              {f === 'unconfirmed' && `Без подтверждения (${visible.filter((m) => m.status === 'unconfirmed').length})`}
+              {f === 'unconfirmed' && `Без свидетеля (${visible.filter((m) => m.status === 'unconfirmed').length})`}
             </button>
           ))}
         </div>
@@ -48,8 +49,10 @@ export function ContactsPage() {
         {filtered.length === 0 ? (
           <div className={styles.empty}>
             {filter === 'all'
-              ? 'Пока нет контактов'
-              : `Нет контактов с фильтром "${filter}"`}
+              ? <>
+                Пока у тебя нет контактов. Хочешь понять как завести? Загляни в <Link to="/about">Гайд</Link>.
+              </>
+              : `У тебя нет контактов с фильтром "${filter === 'confirmed' ? "Подтверждённые" : "Без свидетеля"}".`}
           </div>
         ) : (
           <div className={styles.list}>
