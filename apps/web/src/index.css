@@ -18,6 +18,7 @@
 
   --color-text: #e0e0e0;
   --color-text-primary: var(--color-text);
+  --color-text-invert: color-mix(in srgb, var(--color-accent) 30%, black 70%);
   --color-text-secondary: #888;
 
   --color-accent: #ff6600;

@@ -215,7 +215,7 @@ export function Layout() {
           <li>
             <NavLink to="/leaderboard" className={navLinkClass}>
               <span className={styles.navIcon}>🏆</span>
-              Рейтинг
+              Либерборд
             </NavLink>
           </li>
           <li>

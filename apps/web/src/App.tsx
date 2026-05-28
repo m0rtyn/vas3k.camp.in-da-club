@@ -15,7 +15,6 @@ import { AdminPage } from './pages/AdminPage';
 import { AboutPage } from './pages/AboutPage';
 import { LoginPage } from './pages/LoginPage';
 import { CallbackPage } from './pages/CallbackPage';
-import { NotFoundPage } from './pages/NotFoundPage';
 
 export function App() {
   return (
@@ -38,7 +37,6 @@ export function App() {
         <Route path="/about" element={<AboutPage />} />
         {/* Catch-all: NFC landing or own profile. Param value is a camp_username. */}
         <Route path="/:campUsername" element={<ProfilePage />} />
-        <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
     </ErrorBoundary>

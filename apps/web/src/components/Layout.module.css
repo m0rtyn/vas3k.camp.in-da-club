@@ -202,6 +202,8 @@
   align-items: center;
   justify-self: center;
   padding-left: 1rem;
+  /* padding: 0.5rem 1rem; */
+  /* background-color: var(--color-accent); */
 }
 
 .headerUser {
@@ -243,8 +245,11 @@
   font-size: 18px;
   line-height: 1;
   text-decoration: none;
-  padding: 4px 8px;
   border-radius: var(--radius);
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  color: var(--color-text-invert);
+  background-color: var(--color-accent);
 }
 
 .headerAbout::before {
