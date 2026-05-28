@@ -56,7 +56,7 @@ export function AboutPage() {
             <div className={styles.stepBody}>
               <h3 className={styles.stepTitle}>Нажми «Я познакомился»</h3>
               <p className={styles.stepDesc}>
-                Теперь ваш контакт создан. Сразу после этого появится кнопка «Есть&nbsp;свидетель», она НЕ обязательна.
+                Теперь ваш контакт сохранён. Сразу после этого появится кнопка «Есть&nbsp;свидетель», она НЕ обязательна.
               </p>
             </div>
           </li>
@@ -73,7 +73,7 @@ export function AboutPage() {
                 Зачем это? Чтобы встреча была <Hint label={'засчитана'}>
                     Подтверждённые встречи участвуют в {' '}
                     <Hint label={'Либерборде'}>
-                      В <Link to="/leaderboard">«Либерборде»</Link> список топ-10 самых общительных кэмперов, но без количеств их знакомств. Чем больше контактов, тем ты выше в рейтинге.
+                      В <Link to="/leaderboard">«Либерборде»</Link> список топ-10 самых общительных кэмперов, но без точных количеств их знакомств. Чем больше будет контактов, тем ты выше в Либерборде.
                     </Hint>{' '}
                       и за них ты получишь дополнительные{' '}
                     <Hint label="ачивки">Ну {' '}
@@ -85,7 +85,7 @@ export function AboutPage() {
                 Затем назови свидетелю{' '}
                 <Hint label={<>код</>}>
                   4-значный номер, который появится после нажатия.
-                  Сообщи его свидетелю, чтобы он мог подтвердить новый контакт.
+                  Сообщи его свидетелю, чтобы он мог подтвердить ваше знакомство.
                 </Hint>.<br/>
                 <Hint label={<>Любой</>}>
                   Ну почти: у всех есть{' '}
@@ -94,8 +94,7 @@ export function AboutPage() {
                   </Hint> и они ограничены, особенно если не заводить новых контактов.
                 </Hint>{' '}
                 третий кэмпер открывает вкладку{' '}
-                <Link to="/witness">«Свидетель»</Link> и вводит ваш код. Это
-                защита от злых духов.
+                <Link to="/witness">«Свидетель»</Link> и вводит ваш код. Теперь ваше знакомство подтверждено официально 👨‍⚖️
               </div>
             </div>
           </li>
@@ -107,7 +106,7 @@ export function AboutPage() {
               <h3 className={styles.stepTitle}>Готово</h3>
               <p className={styles.stepDesc}>
                 Встреча подтверждена, контакт сохранён. Найди его в разделе{' '}
-                <Link to="/contacts">«Контакты»</Link>.
+                <Link to="/contacts">«Знакомства»</Link>.
               </p>
             </div>
           </li>
@@ -120,48 +119,56 @@ export function AboutPage() {
         </h2>
         <ul className={styles.cards}>
           <li>
-            <article className={styles.card}>
-              <span className={styles.cardIcon} aria-hidden="true">
-                🏠
-              </span>
-              <h3 className={styles.cardTitle}>Главная</h3>
-              <p className={styles.cardText}>
-                Твоя статистика, последние встречи и быстрый доступ к профилю.
-              </p>
-            </article>
+            <Link to="/" className={styles.cardLink}>
+              <article className={styles.card}>
+                <span className={styles.cardIcon} aria-hidden="true">
+                  🏠
+                </span>
+                <h3 className={styles.cardTitle}>Главная</h3>
+                <p className={styles.cardText}>
+                  Твоя статистика, последние встречи и быстрый доступ к профилю.
+                </p>
+              </article>
+            </Link>
           </li>
           <li>
-            <article className={styles.card}>
-              <span className={styles.cardIcon} aria-hidden="true">
-                👥
-              </span>
-              <h3 className={styles.cardTitle}>Контакты</h3>
-              <p className={styles.cardText}>
-                Все, с кем ты познакомился. С историей и заметками.
-              </p>
-            </article>
+            <Link to="/contacts" className={styles.cardLink}>
+              <article className={styles.card}>
+                <span className={styles.cardIcon} aria-hidden="true">
+                  👥
+                </span>
+                <h3 className={styles.cardTitle}>Знакомства</h3>
+                <p className={styles.cardText}>
+                  Все, с кем ты познакомился. С историей и заметками.
+                </p>
+              </article>
+            </Link>
           </li>
           <li>
-            <article className={styles.card}>
-              <span className={styles.cardIcon} aria-hidden="true">
-                🏆
-              </span>
-              <h3 className={styles.cardTitle}>Либерборд</h3>
-              <p className={styles.cardText}>
-                Список топ-10 самых активных нетворкеров на кэмпе по версии этого приложения.
-              </p>
-            </article>
+            <Link to="/leaderboard" className={styles.cardLink}>
+              <article className={styles.card}>
+                <span className={styles.cardIcon} aria-hidden="true">
+                  🏆
+                </span>
+                <h3 className={styles.cardTitle}>Либерборд</h3>
+                <p className={styles.cardText}>
+                  Список топ-10 самых активных нетворкеров на кэмпе по версии этого приложения.
+                </p>
+              </article>
+            </Link>
           </li>
           <li>
-            <article className={styles.card}>
-              <span className={styles.cardIcon} aria-hidden="true">
-                👁️
-              </span>
-              <h3 className={styles.cardTitle}>Свидетель</h3>
-              <p className={styles.cardText}>
-                Найди знакомящихся клубней — если они заводят новый контакт, помоги им подтвердить его.
-              </p>
-            </article>
+            <Link to="/witness" className={styles.cardLink}>
+              <article className={styles.card}>
+                <span className={styles.cardIcon} aria-hidden="true">
+                  👁️
+                </span>
+                <h3 className={styles.cardTitle}>Свидетель</h3>
+                <p className={styles.cardText}>
+                  Найди знакомящихся клубней — если они заводят новый контакт, помоги им подтвердить его.
+                </p>
+              </article>
+            </Link>
           </li>
         </ul>
       </section>

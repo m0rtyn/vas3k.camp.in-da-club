@@ -74,7 +74,7 @@ function CampUsername({ value }: { value: string }) {
     <div className={styles.campUsername}>
       Твой юзернейм
       <Hint label="">
-        Используется для добавления в контакты. Зашит в NFC-чипе.
+        Используется для добавления в контакты на странице Знакомств. Зашит в NFC-чипе.
       </Hint>
       :{' '}
       <button

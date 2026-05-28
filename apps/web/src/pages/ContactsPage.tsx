@@ -30,7 +30,7 @@ export function ContactsPage() {
   return (
     <AuthGuard>
       <div className={styles.page}>
-        <div className={styles.title}>Контакты</div>
+        <div className={styles.title}>Знакомства</div>
 
         <div className={styles.filters}>
           {(['all', 'confirmed', 'unconfirmed'] as Filter[]).map((f) => (

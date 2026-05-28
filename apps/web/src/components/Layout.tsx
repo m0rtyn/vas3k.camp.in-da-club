@@ -203,7 +203,7 @@ export function Layout() {
           <li>
             <NavLink to="/contacts" className={navLinkClass}>
               <span className={styles.navIcon}>👥</span>
-              Контакты
+              Знакомства
             </NavLink>
           </li>
           <li>

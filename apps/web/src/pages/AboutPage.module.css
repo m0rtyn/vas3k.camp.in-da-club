@@ -166,6 +166,11 @@
   gap: 6px;
 }
 
+.cardLink {
+  color: inherit;
+  text-decoration: none;
+}
+
 .cardIcon {
   font-size: 22px;
 }
