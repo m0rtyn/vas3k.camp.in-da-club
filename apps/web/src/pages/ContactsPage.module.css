@@ -33,7 +33,7 @@
 
 .empty {
   text-align: center;
-  color: var(--color-text-secondary);
+  /* color: var(--color-text-secondary); */
   padding: 40px 20px;
 }
 

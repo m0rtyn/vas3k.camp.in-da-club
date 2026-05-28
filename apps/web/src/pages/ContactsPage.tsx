@@ -50,7 +50,7 @@ export function ContactsPage() {
           <div className={styles.empty}>
             {filter === 'all'
               ? <>
-                Пока у тебя нет контактов. Хочешь понять как завести? Загляни в <Link to="/about">Гайд</Link>.
+                У тебя пока нет контактов 🤷<br/>Хочешь понять как завести? Загляни в <Link to="/about">Гайд</Link>.
               </>
               : `У тебя нет контактов с фильтром "${filter === 'confirmed' ? "Подтверждённые" : "Без свидетеля"}".`}
           </div>
