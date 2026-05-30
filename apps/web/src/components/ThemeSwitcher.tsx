@@ -6,8 +6,9 @@ const OPTIONS: { value: ThemeMode; label: string; emoji: string }[] = [
   { value: 'system', label: 'Авто', emoji: '🖥️' },
   { value: 'light', label: 'Светлая', emoji: '☀️' },
   { value: 'dark', label: 'Тёмная', emoji: '🌙' },
-  { value: 'pipboy', label: 'Пип-бой', emoji: '📟' },
 ];
+
+export const PIP_THEME = { value: 'pipboy' as const, label: 'Пип-бой' as const, emoji: '📟' };
 
 export function ThemeSwitcher() {
   const theme = useThemeStore((s) => s.theme);
@@ -55,6 +56,22 @@ export function ThemeSwitcher() {
         />
         <span className={styles.contrastLabel}>
           <span aria-hidden>🔆</span> Контрастный режим
+        </span>
+      </label>
+
+      <label
+        className={styles.contrastRow}
+        // title={isPipboy ? 'Не применяется к теме' : undefined}
+      >
+        <input
+          type="checkbox"
+          checked={isPipboy}
+          // disabled={isPipboy}
+          onChange={(e) => setTheme(PIP_THEME.value)}
+          className={styles.checkbox}
+        />
+        <span className={styles.contrastLabel}>
+          <span aria-hidden>🔆</span> Пип-бой
         </span>
       </label>
     </div>

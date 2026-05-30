@@ -242,7 +242,7 @@
 
 .headerAbout {
   position: relative;
-  font-size: 18px;
+  font-size: 0.8rem;
   line-height: 1;
   text-decoration: none;
   border-radius: var(--radius);
@@ -278,12 +278,13 @@
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 30px;
-  font-weight: 800;
+  font-size: 1.5rem;
+  /* font-weight: 800; */
   /* text-shadow: 1px 1px 0 #fff; */
   padding: 4px 8px;
   color: var(--color-text);
   line-height: 1;
+  outline: none;
 }
 
 .menuButton::before {

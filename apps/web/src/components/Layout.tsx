@@ -148,14 +148,13 @@ export function Layout() {
               </>
             )}
 
-            <div className={styles.headerMenu}>
               <NavLink
                 to="/about"
                 className={styles.headerAbout}
                 title="Как пользоваться"
                 aria-label="Как пользоваться"
               >
-                ℹ️ Что это?
+                Что это?
               </NavLink>
               <div className={styles.menuWrapper} ref={menuRef}>
                 <button
@@ -163,7 +162,7 @@ export function Layout() {
                   onClick={() => setShowMenu((v) => !v)}
                   title="Меню"
                 >
-                  ⋮
+                  ⚙︎
                 </button>
                 {showMenu && (
                   <div className={styles.menu}>
@@ -177,7 +176,6 @@ export function Layout() {
                   </div>
                 )}
               </div>
-            </div>
           </div>
         )}
       </header>
