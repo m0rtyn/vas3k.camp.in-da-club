@@ -1,50 +1,27 @@
 import { useMemo } from 'react';
-import type { ContactGraphData } from '../../lib/recap/selectors';
+import type { RecapGraph } from '@vklube/shared';
+import { layoutGraph } from '../../lib/recap/graphLayout';
 import styles from './RecapContactGraph.module.css';
 
 interface Props {
-  data: ContactGraphData;
+  graph: RecapGraph;
+  meId: string;
+  /** True if showing a partial (ego-only) graph because the full one isn't available. */
+  isLocalFallback?: boolean;
 }
 
-const SIZE = 360;
-const CENTER = SIZE / 2;
-const EGO_RADIUS = 24;
-const NODE_RADIUS = 14;
-const RING_PADDING = 30;
+const SIZE = 520;
 
-export function RecapContactGraph({ data }: Props) {
-  const { nodes, edges } = data;
-  const others = useMemo(() => nodes.filter((n) => !n.isMe), [nodes]);
+export function RecapContactGraph({ graph, meId, isLocalFallback }: Props) {
+  const layout = useMemo(
+    () => layoutGraph(graph, meId, { width: SIZE, height: SIZE }),
+    [graph, meId],
+  );
 
-  // Place "others" on concentric rings (up to 24 per ring), evenly spaced.
-  const positions = useMemo(() => {
-    const map = new Map<string, { x: number; y: number }>();
-    map.set(
-      nodes.find((n) => n.isMe)?.id ?? '_me',
-      { x: CENTER, y: CENTER },
-    );
-    const perRing = 18;
-    const ringGap = 70;
-    const maxRadius = CENTER - RING_PADDING;
+  const otherCount =
+    layout.nodes.length - (layout.nodes.some((n) => n.id === meId) ? 1 : 0);
 
-    others.forEach((node, i) => {
-      const ring = Math.floor(i / perRing);
-      const idxInRing = i % perRing;
-      const inRing = Math.min(perRing, others.length - ring * perRing);
-      const radius = Math.min(maxRadius, 80 + ring * ringGap);
-      // Offset each ring's start angle so nodes don't stack radially.
-      const startAngle = ring * 0.31;
-      const angle = startAngle + (idxInRing / inRing) * Math.PI * 2;
-      map.set(node.id, {
-        x: CENTER + Math.cos(angle) * radius,
-        y: CENTER + Math.sin(angle) * radius,
-      });
-    });
-
-    return map;
-  }, [nodes, others]);
-
-  if (others.length === 0) {
+  if (otherCount === 0) {
     return (
       <section className={styles.section}>
         <h2 className={styles.title}>Граф контактов</h2>
@@ -55,26 +32,31 @@ export function RecapContactGraph({ data }: Props) {
     );
   }
 
+  const maxDegree = Math.max(1, ...layout.nodes.map((n) => n.degree));
+  const posById = new Map(layout.nodes.map((n) => [n.id, n]));
+
   return (
     <section className={styles.section}>
       <h2 className={styles.title}>Граф контактов</h2>
       <p className={styles.subtitle}>
-        Ты в центре. Каждая точка — человек, с которым подтвердили знакомство.
+        {isLocalFallback
+          ? 'Твои подтверждённые знакомства. Подключись к сети, чтобы увидеть весь граф кэмпа.'
+          : 'Все подтверждённые знакомства кэмпа. Ты — выделенная точка.'}
       </p>
 
       <div className={styles.graphWrap}>
         <svg
-          viewBox={`0 0 ${SIZE} ${SIZE}`}
+          viewBox={`0 0 ${layout.width} ${layout.height}`}
           width="100%"
           className={styles.svg}
           role="img"
-          aria-label={`Граф из ${others.length} контактов`}
+          aria-label={`Граф из ${layout.nodes.length} человек и ${layout.edges.length} связей`}
         >
-          {/* Edges first so nodes draw on top */}
-          {edges.map((e, i) => {
-            const a = positions.get(e.source);
-            const b = positions.get(e.target);
+          {layout.edges.map((e, i) => {
+            const a = posById.get(e.source);
+            const b = posById.get(e.target);
             if (!a || !b) return null;
+            const touchesMe = a.id === meId || b.id === meId;
             return (
               <line
                 key={`e-${i}`}
@@ -82,28 +64,42 @@ export function RecapContactGraph({ data }: Props) {
                 y1={a.y}
                 x2={b.x}
                 y2={b.y}
-                className={styles.edge}
+                className={touchesMe ? styles.edgeMine : styles.edge}
               />
             );
           })}
 
-          {/* Ego node */}
-          <circle cx={CENTER} cy={CENTER} r={EGO_RADIUS} className={styles.egoNode} />
-
-          {/* Other nodes */}
-          {others.map((node) => {
-            const p = positions.get(node.id);
-            if (!p) return null;
+          {layout.nodes.map((node) => {
+            const isMe = node.id === meId;
+            const r = isMe ? 9 : Math.max(2.5, 2.5 + (node.degree / maxDegree) * 4.5);
             return (
-              <g key={node.id}>
-                <circle cx={p.x} cy={p.y} r={NODE_RADIUS} className={styles.node}>
-                  <title>{`@${node.id}`}</title>
-                </circle>
-              </g>
+              <circle
+                key={node.id}
+                cx={node.x}
+                cy={node.y}
+                r={r}
+                className={isMe ? styles.egoNode : styles.node}
+              >
+                <title>{`@${node.id} · ${node.degree} ${pluralizeContacts(node.degree)}`}</title>
+              </circle>
             );
           })}
         </svg>
       </div>
+
+      <div className={styles.legend}>
+        <span>{layout.nodes.length} участников</span>
+        <span aria-hidden="true">·</span>
+        <span>{layout.edges.length} связей</span>
+      </div>
     </section>
   );
+}
+
+function pluralizeContacts(n: number): string {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return 'контакт';
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return 'контакта';
+  return 'контактов';
 }

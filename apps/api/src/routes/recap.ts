@@ -2,13 +2,14 @@ import { Hono } from 'hono';
 import { sql } from 'drizzle-orm';
 import { db } from '../db';
 import { isCampOver } from '@vklube/shared';
-import type { RecapStats } from '@vklube/shared';
+import type { RecapGraph, RecapStats } from '@vklube/shared';
 import type { AppEnv } from '../types';
 
 const recap = new Hono<AppEnv>();
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
 let cached: { data: RecapStats; expiresAt: number } | null = null;
+let cachedGraph: { data: RecapGraph; expiresAt: number } | null = null;
 
 interface StatsRow {
   total_participants: string | number;
@@ -200,6 +201,66 @@ recap.get('/stats', async (c) => {
 
   c.header('Cache-Control', 'public, max-age=300');
   return c.json(cached.data);
+});
+
+interface GraphNodeRow {
+  username: string;
+  camp_username: string | null;
+}
+
+interface GraphEdgeRow {
+  a: string;
+  b: string;
+}
+
+async function computeGraph(): Promise<RecapGraph> {
+  const nodesResult = await db.execute(sql`
+    SELECT u.username, u.camp_username
+    FROM users u
+    WHERE EXISTS (
+      SELECT 1 FROM meetings m
+      WHERE m.status = 'confirmed'
+        AND (m.initiator_username = u.username OR m.target_username = u.username)
+    )
+  `);
+  const nodes = (nodesResult as unknown as GraphNodeRow[]).map((n) => ({
+    username: n.username,
+    camp_username: n.camp_username,
+  }));
+
+  const edgesResult = await db.execute(sql`
+    SELECT
+      LEAST(initiator_username, target_username) AS a,
+      GREATEST(initiator_username, target_username) AS b
+    FROM meetings
+    WHERE status = 'confirmed'
+    GROUP BY a, b
+  `);
+  const edges = (edgesResult as unknown as GraphEdgeRow[]).map((e) => ({
+    a: e.a,
+    b: e.b,
+  }));
+
+  return { nodes, edges };
+}
+
+/**
+ * GET /api/recap/graph — Full camp contact graph (anonymous).
+ * Only club usernames + camp_usernames are returned (no display names or avatars).
+ */
+recap.get('/graph', async (c) => {
+  if (!isCampOver()) {
+    return c.json({ error: 'recap_locked', message: 'Recap opens after the camp ends.' }, 404);
+  }
+
+  const now = Date.now();
+  if (!cachedGraph || cachedGraph.expiresAt < now) {
+    const data = await computeGraph();
+    cachedGraph = { data, expiresAt: now + CACHE_TTL_MS };
+  }
+
+  c.header('Cache-Control', 'public, max-age=300');
+  return c.json(cachedGraph.data);
 });
 
 export default recap;

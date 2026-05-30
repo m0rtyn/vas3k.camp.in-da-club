@@ -1,7 +1,6 @@
 import { CAMP_TIMEZONE } from '@vklube/shared';
 import {
   getConfirmedMeetings,
-  getContactGraphData,
   getTimelineCumulative,
   getUniquePeopleMet,
   getWitnessedMeetings,
@@ -12,6 +11,7 @@ import { evaluateAchievements } from '../lib/recap/achievements';
 import { buildProfilesMarkdown } from '../lib/recap/exportProfiles';
 import {
   mockDisplayNames,
+  mockGraph,
   mockMeetings,
   mockMyRank,
   mockStats,
@@ -41,7 +41,6 @@ export function RecapPreviewPage() {
   const unique = getUniquePeopleMet(ctx);
   const witnessed = getWitnessedMeetings(ctx);
   const timeline = getTimelineCumulative(ctx, CAMP_TIMEZONE);
-  const graph = getContactGraphData(ctx);
   const funStats = computeFunStats(ctx);
   const achievements = evaluateAchievements({
     ...ctx,
@@ -67,7 +66,7 @@ export function RecapPreviewPage() {
         witnessedCount={witnessed.length}
       />
 
-      <RecapContactGraph data={graph} />
+      <RecapContactGraph graph={mockGraph} meId={mockUser.username} isLocalFallback={false} />
 
       <RecapComparison
         myCount={confirmed.length}

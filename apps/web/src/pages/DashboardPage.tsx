@@ -5,6 +5,7 @@ import { useAuthStore } from '../store/auth';
 import { useMeetingsStore } from '../store/meetings';
 import { ContactListItem } from '../components/ContactListItem';
 import { Hint } from '../components/Hint';
+import { RecapEntryCard } from '../components/RecapEntryCard';
 import styles from './DashboardPage.module.css';
 
 export function DashboardPage() {
@@ -64,6 +65,8 @@ export function DashboardPage() {
           </div>
         </div>
       </div>
+
+      <RecapEntryCard />
 
       <div className={styles.section}>
         <div className={styles.sectionTitle}>Недавние контакты</div>

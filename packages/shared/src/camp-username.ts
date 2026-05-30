@@ -8,12 +8,12 @@ import {
 /**
  * Normalize a club slug for use as the camp_username suffix.
  *
- * - Lowercases all characters.
+ * - Preserves the original letter case (so `Klalofu` stays `Klalofu`).
  * - Preserves digits and underscores (so `kiwi_v_chili` stays recognizable).
- * - Strips any other non-`[a-z0-9_]` characters (rare edge case).
+ * - Strips any other non-`[A-Za-z0-9_]` characters (rare edge case).
  */
 export function normalizeSlug(slug: string): string {
-  return slug.toLowerCase().replace(/[^a-z0-9_]/g, '');
+  return slug.replace(/[^A-Za-z0-9_]/g, '');
 }
 
 /**

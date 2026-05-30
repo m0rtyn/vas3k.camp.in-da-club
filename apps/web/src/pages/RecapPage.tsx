@@ -4,6 +4,7 @@ import {
   CAMP_TIMEZONE,
   isCampOver,
   type LeaderboardEntry,
+  type RecapGraph,
   type RecapStats,
 } from '@vklube/shared';
 import { AuthGuard } from '../components/AuthGuard';
@@ -12,12 +13,12 @@ import { useMeetingsStore } from '../store/meetings';
 import { api } from '../lib/api';
 import {
   getConfirmedMeetings,
-  getContactGraphData,
   getTimelineCumulative,
   getUniquePeopleMet,
   getWitnessedMeetings,
   type RecapContext,
 } from '../lib/recap/selectors';
+import { buildLocalEgoGraph } from '../lib/recap/graphLayout';
 import { computeFunStats } from '../lib/recap/funStats';
 import { evaluateAchievements } from '../lib/recap/achievements';
 import { buildProfilesMarkdown } from '../lib/recap/exportProfiles';
@@ -58,7 +59,7 @@ function CampNotOver() {
       <div className={styles.lockedEmoji}>🔒</div>
       <h1 className={styles.lockedTitle}>Итоги откроются после кэмпа</h1>
       <p className={styles.lockedText}>
-        Страница станет доступна {opensAt}. До тех пор — копи контакты!
+        Страница станет доступна {opensAt}. До тех пор — копи больше знакомств!
       </p>
     </div>
   );
@@ -69,6 +70,7 @@ function RecapContent() {
   const { meetings, fetchMeetings, isLoading: meetingsLoading } = useMeetingsStore();
   const [stats, setStats] = useState<RecapStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
+  const [graphData, setGraphData] = useState<RecapGraph | null>(null);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [myRank, setMyRank] = useState<number | null>(null);
 
@@ -78,7 +80,7 @@ function RecapContent() {
 
   useEffect(() => {
     let cancelled = false;
-    const load = async () => {
+    const loadStats = async () => {
       try {
         const data = await api.get<RecapStats>('/recap/stats');
         if (!cancelled) setStats(data);
@@ -88,15 +90,25 @@ function RecapContent() {
         if (!cancelled) setStatsLoading(false);
       }
     };
+    const loadGraph = async () => {
+      try {
+        const data = await api.get<RecapGraph>('/recap/graph');
+        if (!cancelled) setGraphData(data);
+      } catch {
+        /* fall back to local ego graph */
+      }
+    };
     if (navigator.onLine) {
-      load();
+      loadStats();
+      loadGraph();
     } else {
       setStatsLoading(false);
     }
 
     const goOnline = () => {
       setIsOffline(false);
-      load();
+      loadStats();
+      loadGraph();
     };
     const goOffline = () => setIsOffline(true);
     window.addEventListener('online', goOnline);
@@ -141,7 +153,8 @@ function RecapContent() {
   const unique = getUniquePeopleMet(ctx);
   const witnessed = getWitnessedMeetings(ctx);
   const timeline = getTimelineCumulative(ctx, CAMP_TIMEZONE);
-  const graph = getContactGraphData(ctx);
+  const graph = graphData ?? buildLocalEgoGraph(meetings, user);
+  const isLocalGraph = !graphData;
   const funStats = computeFunStats(ctx);
   const achievements = evaluateAchievements({
     ...ctx,
@@ -162,7 +175,11 @@ function RecapContent() {
         witnessedCount={witnessed.length}
       />
 
-      <RecapContactGraph data={graph} />
+      <RecapContactGraph
+        graph={graph}
+        meId={user.username}
+        isLocalFallback={isLocalGraph}
+      />
 
       <RecapComparison
         myCount={confirmed.length}

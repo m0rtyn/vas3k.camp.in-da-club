@@ -28,12 +28,12 @@ export function RecapExport({ markdown, count }: Props) {
         Скопируй и сохрани, куда удобно.
       </p>
 
-      <pre className={styles.preview} aria-label="Список профилей в Markdown">
+      <pre className={styles.preview} aria-label="Список профилей">
         {markdown}
       </pre>
 
       <button className={styles.button} onClick={handleCopy}>
-        {copied ? '✓ Скопировано' : '📋 Скопировать Markdown'}
+        {copied ? '✓ Скопировано' : '📋 Скопировать список знакомств'}
       </button>
     </section>
   );

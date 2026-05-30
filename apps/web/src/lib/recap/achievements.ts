@@ -44,7 +44,7 @@ export function evaluateAchievements(ctx: EvaluateContext): Achievement[] {
       id: 'first_meeting',
       emoji: '⚡',
       title: 'Есть пробитие',
-      description: `Первая встреча кэмпа: ${init.display_name} ↔ ${targ.display_name}`,
+      description: `Первая встреча кэмпа: @${init.username} ↔ @${targ.username}`,
       scope: 'global',
       holder: { username: init.username, display_name: init.display_name },
       earnedByMe,
@@ -57,7 +57,7 @@ export function evaluateAchievements(ctx: EvaluateContext): Achievement[] {
       title: 'Просто машина',
       description: 'Больше всего подтверждённых знакомств в кэмпе',
       scope: 'global',
-      value: `${g.top_networker.count} контактов`,
+      value: `${g.top_networker.count} Знакомств`,
       holder: {
         username: g.top_networker.username,
         display_name: g.top_networker.display_name,

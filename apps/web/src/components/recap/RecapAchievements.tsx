@@ -63,7 +63,7 @@ function Card({ ach }: { ach: Achievement }) {
         <div className={styles.cardDesc}>{ach.description}</div>
         {ach.value && <div className={styles.cardValue}>{ach.value}</div>}
         {ach.holder && !ach.earnedByMe && (
-          <div className={styles.holder}>держит: {ach.holder.display_name}</div>
+          <div className={styles.holder}>держит: @{ach.holder.username}</div>
         )}
       </div>
     </div>
