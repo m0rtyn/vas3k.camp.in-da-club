@@ -27,7 +27,7 @@ export const CAMP_TIMEZONE = 'Europe/Belgrade';
  * Used for gating the Recap page and time-based logic.
  */
 export const CAMP_START_DATE = '2026-05-28T10:00:00+02:00';
-export const CAMP_END_DATE = '2026-05-30T20:30:00+02:00';
+export const CAMP_END_DATE = '2026-05-30T20:00:00+02:00';
 
 /** App name */
 export const APP_NAME = 'ВКлубе';
