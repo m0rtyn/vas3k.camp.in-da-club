@@ -263,4 +263,40 @@ recap.get('/graph', async (c) => {
   return c.json(cachedGraph.data);
 });
 
+/**
+ * GET /api/recap/profiles — Display names for the current user's confirmed contacts.
+ *
+ * Returns `{ username, display_name }[]` for every person the requesting user
+ * has a confirmed meeting with. Used to build the copyable contacts list on
+ * the recap page. Not cached — per-user response is tiny.
+ */
+recap.get('/profiles', async (c) => {
+  if (!isCampOver()) {
+    return c.json({ error: 'recap_locked', message: 'Recap opens after the camp ends.' }, 404);
+  }
+
+  const user = c.get('user');
+
+  const rows = await db.execute(sql`
+    SELECT u.username, u.display_name
+    FROM users u
+    WHERE u.username IN (
+      SELECT CASE
+        WHEN m.initiator_username = ${user.username} THEN m.target_username
+        ELSE m.initiator_username
+      END
+      FROM meetings m
+      WHERE m.status = 'confirmed'
+        AND (m.initiator_username = ${user.username} OR m.target_username = ${user.username})
+    )
+  `);
+
+  const profiles = (rows as unknown as { username: string; display_name: string }[]).map((r) => ({
+    username: r.username,
+    display_name: r.display_name,
+  }));
+
+  return c.json({ profiles });
+});
+
 export default recap;

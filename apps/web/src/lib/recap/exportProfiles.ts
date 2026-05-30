@@ -4,42 +4,68 @@ interface BuildArgs {
   meetings: Meeting[];
   currentUser: User;
   /**
-   * Map club-username → display name. Optional; if missing, the link text
-   * falls back to the username itself.
+   * Map club-username → display name. Optional; if missing, the label
+   * falls back to "@username".
    */
   displayNames?: Map<string, string>;
+}
+
+export interface ProfileEntry {
+  /** Club slug (vas3k.club username). */
+  username: string;
+  /** Human-readable label: display_name or "@username" if unknown. */
+  label: string;
+  /** Profile URL on vas3k.club. */
+  url: string;
 }
 
 const CLUB_USER_URL = 'https://vas3k.club/user/';
 
 /**
- * Builds a plain text list of confirmed contacts as:
- *   Имя: https://vas3k.club/user/username/
- * If the display name is unknown, falls back to "@username".
- * Sorted alphabetically by username.
+ * Returns confirmed contacts in chronological order — oldest meeting first.
+ * Each contact appears at most once (the earliest confirmation wins).
  */
-export function buildProfilesMarkdown({
+export function buildProfilesList({
   meetings,
   currentUser,
   displayNames,
-}: BuildArgs): string {
+}: BuildArgs): ProfileEntry[] {
   const me = currentUser.username;
-  const usernames = new Set<string>();
+  const seen = new Map<string, string>(); // username → earliest confirmed_at
+
   for (const m of meetings) {
     if (m.status !== 'confirmed') continue;
-    if (m.initiator_username === me) usernames.add(m.target_username);
-    else if (m.target_username === me) usernames.add(m.initiator_username);
+    const other =
+      m.initiator_username === me
+        ? m.target_username
+        : m.target_username === me
+        ? m.initiator_username
+        : null;
+    if (!other) continue;
+    const when = m.confirmed_at ?? m.created_at;
+    const prev = seen.get(other);
+    if (!prev || when < prev) seen.set(other, when);
   }
 
-  const sorted = Array.from(usernames).sort((a, b) => a.localeCompare(b));
-  if (sorted.length === 0) return '';
+  return Array.from(seen.entries())
+    .sort((a, b) => a[1].localeCompare(b[1]))
+    .map(([username]) => {
+      const name = displayNames?.get(username);
+      const label = name && name !== username ? name : `@${username}`;
+      return {
+        username,
+        label,
+        url: `${CLUB_USER_URL}${encodeURIComponent(username)}/`,
+      };
+    });
+}
 
-  const lines = sorted.map((u) => {
-    const name = displayNames?.get(u);
-    const label = name && name !== u ? name : `@${u}`;
-    return `${label}: ${CLUB_USER_URL}${encodeURIComponent(u)}/`;
-  });
-  return lines.join('\n');
+/**
+ * Plain-text representation of the contact list — one `Имя: URL` per line.
+ * Used for clipboard copy.
+ */
+export function formatProfilesText(list: ProfileEntry[]): string {
+  return list.map((p) => `${p.label}: ${p.url}`).join('\n');
 }
 
 /** Copies text to clipboard with a graceful fallback. Returns true on success. */

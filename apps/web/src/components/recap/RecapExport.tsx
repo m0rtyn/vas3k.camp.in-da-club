@@ -1,36 +1,52 @@
-import { useState } from 'react';
-import { copyToClipboard } from '../../lib/recap/exportProfiles';
+import { useMemo, useState } from 'react';
+import {
+  copyToClipboard,
+  formatProfilesText,
+  type ProfileEntry,
+} from '../../lib/recap/exportProfiles';
 import styles from './RecapExport.module.css';
 
 interface Props {
-  markdown: string;
-  count: number;
+  profiles: ProfileEntry[];
 }
 
-export function RecapExport({ markdown, count }: Props) {
+export function RecapExport({ profiles }: Props) {
   const [copied, setCopied] = useState(false);
+  const text = useMemo(() => formatProfilesText(profiles), [profiles]);
 
   const handleCopy = async () => {
-    const ok = await copyToClipboard(markdown);
+    const ok = await copyToClipboard(text);
     if (ok) {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2000);
     }
   };
 
-  if (count === 0) return null;
+  if (profiles.length === 0) return null;
 
   return (
     <section className={styles.section}>
       <h2 className={styles.title}>Список контактов</h2>
       <p className={styles.subtitle}>
-        {count} {pluralize(count, ['человек', 'человека', 'человек'])} с подтверждёнными встречами.
-        Скопируй и сохрани, куда удобно.
+        {profiles.length} {pluralize(profiles.length, ['человек', 'человека', 'человек'])} с
+        подтверждёнными встречами, в порядке знакомства.
       </p>
 
-      <pre className={styles.preview} aria-label="Список профилей">
-        {markdown}
-      </pre>
+      <ol className={styles.list} aria-label="Список профилей">
+        {profiles.map((p) => (
+          <li key={p.username} className={styles.item}>
+            <span className={styles.name}>{p.label}</span>
+            <a
+              href={p.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.link}
+            >
+              {p.url.replace(/^https?:\/\//, '')}
+            </a>
+          </li>
+        ))}
+      </ol>
 
       <button className={styles.button} onClick={handleCopy}>
         {copied ? '✓ Скопировано' : '📋 Скопировать список знакомств'}

@@ -21,7 +21,7 @@ import {
 import { buildLocalEgoGraph } from '../lib/recap/graphLayout';
 import { computeFunStats } from '../lib/recap/funStats';
 import { evaluateAchievements } from '../lib/recap/achievements';
-import { buildProfilesMarkdown } from '../lib/recap/exportProfiles';
+import { buildProfilesList } from '../lib/recap/exportProfiles';
 import { RecapHero } from '../components/recap/RecapHero';
 import { RecapContactGraph } from '../components/recap/RecapContactGraph';
 import { RecapComparison } from '../components/recap/RecapComparison';
@@ -71,6 +71,7 @@ function RecapContent() {
   const [stats, setStats] = useState<RecapStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
   const [graphData, setGraphData] = useState<RecapGraph | null>(null);
+  const [displayNames, setDisplayNames] = useState<Map<string, string>>(() => new Map());
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [myRank, setMyRank] = useState<number | null>(null);
 
@@ -98,9 +99,22 @@ function RecapContent() {
         /* fall back to local ego graph */
       }
     };
+    const loadProfiles = async () => {
+      try {
+        const data = await api.get<{ profiles: { username: string; display_name: string }[] }>(
+          '/recap/profiles',
+        );
+        if (!cancelled) {
+          setDisplayNames(new Map(data.profiles.map((p) => [p.username, p.display_name])));
+        }
+      } catch {
+        /* fall back to @username in export */
+      }
+    };
     if (navigator.onLine) {
       loadStats();
       loadGraph();
+      loadProfiles();
     } else {
       setStatsLoading(false);
     }
@@ -109,6 +123,7 @@ function RecapContent() {
       setIsOffline(false);
       loadStats();
       loadGraph();
+      loadProfiles();
     };
     const goOffline = () => setIsOffline(true);
     window.addEventListener('online', goOnline);
@@ -161,9 +176,10 @@ function RecapContent() {
     globalStats: stats,
     myRank,
   });
-  const markdown = buildProfilesMarkdown({
+  const profiles = buildProfilesList({
     meetings,
     currentUser: user,
+    displayNames,
   });
 
   return (
@@ -194,7 +210,7 @@ function RecapContent() {
 
       <RecapFunStats stats={funStats} />
 
-      <RecapExport markdown={markdown} count={unique.length} />
+      <RecapExport profiles={profiles} />
     </div>
   );
 }

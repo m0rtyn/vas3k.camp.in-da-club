@@ -8,7 +8,7 @@ import {
 } from '../lib/recap/selectors';
 import { computeFunStats } from '../lib/recap/funStats';
 import { evaluateAchievements } from '../lib/recap/achievements';
-import { buildProfilesMarkdown } from '../lib/recap/exportProfiles';
+import { buildProfilesList } from '../lib/recap/exportProfiles';
 import {
   mockDisplayNames,
   mockGraph,
@@ -47,7 +47,7 @@ export function RecapPreviewPage() {
     globalStats: mockStats,
     myRank: mockMyRank,
   });
-  const markdown = buildProfilesMarkdown({
+  const profiles = buildProfilesList({
     meetings: mockMeetings,
     currentUser: mockUser,
     displayNames: mockDisplayNames,
@@ -81,7 +81,7 @@ export function RecapPreviewPage() {
 
       <RecapFunStats stats={funStats} />
 
-      <RecapExport markdown={markdown} count={unique.length} />
+      <RecapExport profiles={profiles} />
     </div>
   );
 }
