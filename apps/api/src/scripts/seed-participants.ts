@@ -41,16 +41,8 @@
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, basename, extname, join, resolve } from 'node:path';
-import { randomInt } from 'node:crypto';
 import { and, eq, isNull } from 'drizzle-orm';
-import {
-  ADJECTIVES_BY_BUCKET,
-  CAMP_USERNAME_SEPARATOR,
-  MAX_CAMP_USERNAME_LEN,
-  pickBucket,
-  bucketFallbacks,
-  formatCampUsername,
-} from '@vklube/shared';
+import { MAX_CAMP_USERNAME_LEN } from '@vklube/shared';
 import { users } from '../schema';
 
 const DEFAULT_PATH = 'camp-usernames.csv';
@@ -94,92 +86,7 @@ const cli = parseCliArgs(process.argv.slice(2));
 process.env.DATABASE_URL = cli.dbUrl;
 
 const { db } = await import('../db');
-
-/**
- * Case-preserving slug normalization for the seed script: keeps original
- * letter case (only strips characters outside `[A-Za-z0-9_]`). The shared
- * `normalizeSlug` lowercases, which destroys case in generated camp_usernames
- * (e.g. `Katya_G` → `katya_g`). We want stickers/URLs to keep the user's
- * preferred casing.
- */
-function normalizeSlugPreserveCase(slug: string): string {
-  return slug.replace(/[^A-Za-z0-9_]/g, '');
-}
-
-/**
- * Local variant of `generateAndAssignCampUsername` that preserves slug case
- * in the camp_username suffix. Mirrors the production retry/fallback logic
- * but uses `normalizeSlugPreserveCase` instead of the lowercasing variant.
- */
-async function generateCampUsernamePreserveCase(slug: string): Promise<string | null> {
-  const rng = (n: number) => randomInt(0, n);
-  const normalized = normalizeSlugPreserveCase(slug);
-  if (!normalized) return null;
-
-  const tried = new Set<string>();
-  const MAX_PROBES = 60;
-  const primary = pickBucket(normalized.length);
-
-  outer: for (const bucket of bucketFallbacks(primary)) {
-    const pool = ADJECTIVES_BY_BUCKET[bucket];
-    const indices = Array.from({ length: pool.length }, (_, i) => i);
-    // Fisher–Yates shuffle.
-    for (let i = indices.length - 1; i > 0; i--) {
-      const j = rng(i + 1);
-      [indices[i], indices[j]] = [indices[j]!, indices[i]!];
-    }
-    for (const i of indices) {
-      if (tried.size >= MAX_PROBES) break outer;
-      const candidate = formatCampUsername(pool[i]!, normalized);
-      if (candidate.length > MAX_CAMP_USERNAME_LEN) continue;
-      if (tried.has(candidate)) continue;
-      tried.add(candidate);
-
-      const assigned = await tryAssignCamp(slug, candidate);
-      if (assigned) return assigned;
-    }
-  }
-
-  // Numeric-suffix fallback (tiny bucket adjectives only, leave room for "_NNNN").
-  const tinyPool = ADJECTIVES_BY_BUCKET.tiny;
-  for (let attempt = 0; attempt < 100; attempt++) {
-    const adj = tinyPool[rng(tinyPool.length)]!;
-    const suffix = String(rng(10_000)).padStart(4, '0');
-    const candidate = `${formatCampUsername(adj, normalized)}${CAMP_USERNAME_SEPARATOR}${suffix}`;
-    if (candidate.length > MAX_CAMP_USERNAME_LEN) continue;
-    if (tried.has(candidate)) continue;
-    tried.add(candidate);
-    const assigned = await tryAssignCamp(slug, candidate);
-    if (assigned) return assigned;
-  }
-
-  return null;
-}
-
-async function tryAssignCamp(slug: string, candidate: string): Promise<string | null> {
-  try {
-    const [row] = await db
-      .update(users)
-      .set({ camp_username: candidate })
-      .where(and(eq(users.username, slug), isNull(users.camp_username)))
-      .returning({ camp_username: users.camp_username });
-    if (row) return row.camp_username;
-
-    // 0 rows updated — either user missing or already has a camp_username.
-    const [existing] = await db
-      .select({ camp_username: users.camp_username })
-      .from(users)
-      .where(eq(users.username, slug))
-      .limit(1);
-    if (!existing) return null;
-    return existing.camp_username;
-  } catch (err: unknown) {
-    if (typeof err === 'object' && err !== null && (err as { code?: string }).code === '23505') {
-      return null; // unique violation → try next candidate
-    }
-    throw err;
-  }
-}
+const { generateAndAssignCampUsername } = await import('../lib/camp-username');
 
 interface CsvRow {
   lineNo: number;
@@ -402,7 +309,7 @@ async function main() {
     if (ins) inserted++;
     else userExisted++;
 
-    const camp = await generateCampUsernamePreserveCase(p.slug);
+    const camp = await generateAndAssignCampUsername(p.slug);
     if (!camp) {
       generateFailed++;
       errors.push(`  ! line ${p.lineNo}: failed to generate camp_username for slug=${p.slug}`);

@@ -1,4 +1,4 @@
-import type { Meeting, RecapStats, User } from '@vklube/shared';
+import type { Meeting, RecapGraph, RecapStats, User } from '@vklube/shared';
 
 /** Mock user — "you" in the recap preview. */
 export const mockUser: User = {
@@ -183,3 +183,53 @@ export const mockMyRank = 6;
 export const mockDisplayNames: Map<string, string> = new Map(
   peers.map((p) => [p.username, p.display_name]),
 );
+
+/**
+ * Mock camp-wide contact graph: 60 anonymous extra participants + the named peers
+ * + the current user. Each node has a few random edges so the graph looks dense
+ * and force-directed layout has something to chew on.
+ */
+function buildMockGraph(): RecapGraph {
+  const nodes: RecapGraph['nodes'] = [
+    { username: mockUser.username, camp_username: mockUser.camp_username },
+    ...peers.map((p) => ({ username: p.username, camp_username: p.camp_username })),
+  ];
+
+  // Add anonymous extras to look like a real ~80-person camp.
+  for (let i = 0; i < 60; i++) {
+    nodes.push({ username: `user_${i + 1}`, camp_username: `anon-${i + 1}` });
+  }
+
+  // Deterministic pseudo-random pairing.
+  let s = 1337;
+  const rand = () => {
+    s = (s * 1664525 + 1013904223) >>> 0;
+    return s / 4294967296;
+  };
+
+  const edgeSet = new Set<string>();
+  const edges: RecapGraph['edges'] = [];
+  const addEdge = (a: string, b: string) => {
+    if (a === b) return;
+    const key = [a, b].sort().join('|');
+    if (edgeSet.has(key)) return;
+    edgeSet.add(key);
+    edges.push({ a, b });
+  };
+
+  // Ensure "me" connects to all named peers (mirrors mockMeetings).
+  for (const p of peers) addEdge(mockUser.username, p.username);
+
+  // Sprinkle random extra edges so most nodes have 2–6 contacts.
+  for (const node of nodes) {
+    const targetDegree = 2 + Math.floor(rand() * 5);
+    for (let k = 0; k < targetDegree; k++) {
+      const other = nodes[Math.floor(rand() * nodes.length)]!;
+      addEdge(node.username, other.username);
+    }
+  }
+
+  return { nodes, edges };
+}
+
+export const mockGraph: RecapGraph = buildMockGraph();

@@ -13,8 +13,9 @@ interface BuildArgs {
 const CLUB_USER_URL = 'https://vas3k.club/user/';
 
 /**
- * Builds a Markdown list of confirmed contacts as:
- *   - [@username](https://vas3k.club/user/username/) — Имя
+ * Builds a plain text list of confirmed contacts as:
+ *   Имя: https://vas3k.club/user/username/
+ * If the display name is unknown, falls back to "@username".
  * Sorted alphabetically by username.
  */
 export function buildProfilesMarkdown({
@@ -35,8 +36,8 @@ export function buildProfilesMarkdown({
 
   const lines = sorted.map((u) => {
     const name = displayNames?.get(u);
-    const suffix = name && name !== u ? ` — ${name}` : '';
-    return `- [@${u}](${CLUB_USER_URL}${encodeURIComponent(u)}/)${suffix}`;
+    const label = name && name !== u ? name : `@${u}`;
+    return `${label}: ${CLUB_USER_URL}${encodeURIComponent(u)}/`;
   });
   return lines.join('\n');
 }

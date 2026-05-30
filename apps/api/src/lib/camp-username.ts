@@ -1,5 +1,5 @@
 import { randomInt } from 'node:crypto';
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, eq, isNull, sql } from 'drizzle-orm';
 import {
   ADJ_TINY,
   CAMP_USERNAME_SEPARATOR,
@@ -105,13 +105,16 @@ function isUniqueViolation(err: unknown): boolean {
 /**
  * Resolve a camp_username to the underlying club slug (users.username).
  * Returns null if no user matches.
+ *
+ * Lookup is case-insensitive so that legacy NFC cards printed with a
+ * lowercased camp_username still resolve, while new cards generated with
+ * case-preserved camp_usernames also work.
  */
 export async function resolveCampUsernameToSlug(campUsername: string): Promise<string | null> {
-  const normalized = campUsername.toLowerCase();
   const [row] = await db
     .select({ username: users.username })
     .from(users)
-    .where(eq(users.camp_username, normalized))
+    .where(sql`LOWER(${users.camp_username}) = LOWER(${campUsername})`)
     .limit(1);
   return row?.username ?? null;
 }

@@ -115,3 +115,22 @@ export interface RecapStats {
     top_witness: (AchievementHolder & { count: number }) | null;
   };
 }
+
+/** Camp-wide contact graph (all confirmed meetings). */
+export interface RecapGraphNode {
+  /** Club username (slug). */
+  username: string;
+  camp_username: string | null;
+}
+
+export interface RecapGraphEdge {
+  /** Club username of one side. */
+  a: string;
+  /** Club username of the other side. */
+  b: string;
+}
+
+export interface RecapGraph {
+  nodes: RecapGraphNode[];
+  edges: RecapGraphEdge[];
+}
