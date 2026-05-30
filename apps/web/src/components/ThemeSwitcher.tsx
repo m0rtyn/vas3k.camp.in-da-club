@@ -6,6 +6,7 @@ const OPTIONS: { value: ThemeMode; label: string; emoji: string }[] = [
   { value: 'system', label: 'Авто', emoji: '🖥️' },
   { value: 'light', label: 'Светлая', emoji: '☀️' },
   { value: 'dark', label: 'Тёмная', emoji: '🌙' },
+  { value: 'pipboy', label: 'Пип-бой', emoji: '📟' },
 ];
 
 export function ThemeSwitcher() {
@@ -13,6 +14,8 @@ export function ThemeSwitcher() {
   const highContrast = useThemeStore((s) => s.highContrast);
   const setTheme = useThemeStore((s) => s.setTheme);
   const setHighContrast = useThemeStore((s) => s.setHighContrast);
+
+  const isPipboy = theme === 'pipboy';
 
   return (
     <div className={styles.wrapper}>
@@ -39,10 +42,14 @@ export function ThemeSwitcher() {
         })}
       </div>
 
-      <label className={styles.contrastRow}>
+      <label
+        className={styles.contrastRow}
+        title={isPipboy ? 'Не применяется к теме' : undefined}
+      >
         <input
           type="checkbox"
-          checked={highContrast}
+          checked={highContrast && !isPipboy}
+          disabled={isPipboy}
           onChange={(e) => setHighContrast(e.target.checked)}
           className={styles.checkbox}
         />

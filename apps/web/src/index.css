@@ -1,11 +1,15 @@
 /*
  * Design tokens & theming.
  * Themes are applied via attributes on <html>:
- *   data-theme="dark" | "light"   — base palette
- *   data-contrast="more"          — high-contrast modifier on top
+ *   data-theme="dark" | "light" | "pipboy"   — base palette
+ *   data-contrast="more"                     — high-contrast modifier on top
  * Default is dark. System preference fallback is handled by the inline
  * script in index.html and the theme store.
+ * Pip-Boy is a standalone immersive CRT theme; it intentionally ignores
+ * the high-contrast modifier.
  */
+
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
 :root,
 [data-theme='dark'] {
@@ -163,6 +167,131 @@
 
   --font-weight-base: 500;
   --border-width: 2px;
+}
+
+/* =========================================================================
+ * Pip-Boy theme — phosphor-green CRT immersion.
+ * Standalone palette. Ignores [data-contrast='more'] (script-side enforced).
+ * ========================================================================= */
+[data-theme='pipboy'] {
+  color-scheme: dark;
+
+  /* Phosphor palette */
+  --pipboy-phosphor: #7cfc9c;
+  --pipboy-phosphor-bright: #39ff14;
+  --pipboy-phosphor-dim: #4a9d68;
+
+  --color-bg: #0b1410;
+  --color-surface: #0f1f17;
+  --color-surface-hover: #13291e;
+  --color-border: #1e6b3a;
+
+  --color-text: var(--pipboy-phosphor);
+  --color-text-primary: var(--pipboy-phosphor);
+  --color-text-secondary: var(--pipboy-phosphor-dim);
+  --color-text-invert: #021006;
+
+  --color-accent: var(--pipboy-phosphor-bright);
+  --color-accent-hover: #5cff3d;
+  --color-accent-soft: rgba(57, 255, 20, 0.15);
+  --color-primary: var(--color-accent);
+  --color-on-accent: #021006;
+
+  --color-success: var(--pipboy-phosphor-bright);
+  --color-success-soft: rgba(57, 255, 20, 0.15);
+  --color-on-success: #021006;
+
+  --color-error: #ff5a5a;
+  --color-danger: var(--color-error);
+  --color-danger-soft: rgba(255, 90, 90, 0.18);
+  --color-on-danger: #200505;
+
+  --color-warning: #ffb84d;
+  --color-warning-soft: rgba(255, 184, 77, 0.18);
+  --color-on-warning: #1a1000;
+
+  --shadow-menu: 0 4px 16px rgba(57, 255, 20, 0.15), 0 0 0 1px rgba(57, 255, 20, 0.25);
+  --shadow-overlay: 0 4px 24px rgba(57, 255, 20, 0.2), 0 0 0 1px rgba(57, 255, 20, 0.3);
+  --shadow-elev-1: 0 1px 3px rgba(57, 255, 20, 0.2);
+
+  --font-family: 'VT323', 'Share Tech Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-mono: 'VT323', 'Share Tech Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-weight-base: 400;
+}
+
+/* VT323 reads small at default sizes — bump the root scale a touch. */
+:root[data-theme='pipboy'] {
+  font-size: 17px;
+}
+
+/* Persistent CRT phosphor glow on text + green tint on emoji/raster content.
+ * The filter chain (grayscale → sepia → hue-rotate → saturate) re-tints any
+ * colored content (emojis, images) into the phosphor palette. Text is already
+ * monochrome green so the visual delta on text is negligible.
+ * Filter is applied to <body> only; the CRT overlays live on <html> so they
+ * stay un-filtered and the body's new stacking context doesn't trap them.
+ */
+[data-theme='pipboy'] body {
+  text-shadow:
+    0 0 1px currentColor,
+    0 0 4px rgba(57, 255, 20, 0.35);
+  filter: grayscale(1) sepia(1) hue-rotate(70deg) saturate(4) brightness(0.95);
+}
+
+/* Glow on borders / inputs / buttons for that pipboy chrome feel. */
+[data-theme='pipboy'] button,
+[data-theme='pipboy'] input,
+[data-theme='pipboy'] select,
+[data-theme='pipboy'] textarea {
+  box-shadow:
+    inset 0 0 6px rgba(57, 255, 20, 0.18),
+    0 0 4px rgba(57, 255, 20, 0.12);
+}
+
+/* Scanlines overlay — repeating horizontal lines across the viewport.
+ * Mounted on <html> so it isn't affected by the body filter above. */
+[data-theme='pipboy']::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0.18) 2px,
+    rgba(0, 0, 0, 0.18) 3px
+  );
+  mix-blend-mode: multiply;
+}
+
+/* Vignette + faint phosphor wash. */
+[data-theme='pipboy']::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background:
+    radial-gradient(ellipse at center, rgba(57, 255, 20, 0.04) 0%, rgba(0, 0, 0, 0) 50%),
+    radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+/* Subtle CRT flicker — gated behind reduced-motion preference. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes pipboy-flicker {
+    0%, 100% { opacity: 1; }
+    7% { opacity: 0.97; }
+    14% { opacity: 1; }
+    42% { opacity: 0.98; }
+    63% { opacity: 1; }
+    81% { opacity: 0.96; }
+    92% { opacity: 1; }
+  }
+  [data-theme='pipboy']::before {
+    animation: pipboy-flicker 5s infinite steps(1, end);
+  }
 }
 
 * {

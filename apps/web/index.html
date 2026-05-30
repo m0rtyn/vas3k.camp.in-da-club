@@ -15,7 +15,7 @@
         try {
           var raw = localStorage.getItem('vklube-theme');
           var saved = raw ? JSON.parse(raw) : null;
-          var theme = saved && (saved.theme === 'dark' || saved.theme === 'light') ? saved.theme : 'system';
+          var theme = saved && (saved.theme === 'dark' || saved.theme === 'light' || saved.theme === 'pipboy') ? saved.theme : 'system';
           var highContrast = !!(saved && saved.highContrast);
           if (!saved && window.matchMedia && window.matchMedia('(prefers-contrast: more)').matches) {
             highContrast = true;
@@ -24,12 +24,15 @@
           if (theme === 'system') {
             resolved = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
           }
+          // Pip-Boy ignores the high-contrast modifier.
+          if (resolved === 'pipboy') highContrast = false;
           document.documentElement.setAttribute('data-theme', resolved);
           if (highContrast) document.documentElement.setAttribute('data-contrast', 'more');
           var meta = document.querySelector('meta[name="theme-color"]');
           if (meta) {
             var color;
-            if (highContrast) color = resolved === 'light' ? '#ffffff' : '#000000';
+            if (resolved === 'pipboy') color = '#0b1410';
+            else if (highContrast) color = resolved === 'light' ? '#ffffff' : '#000000';
             else color = resolved === 'light' ? '#ffffff' : '#1a1a1a';
             meta.setAttribute('content', color);
           }

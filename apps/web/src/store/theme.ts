@@ -30,8 +30,12 @@ function loadPersisted(): PersistedThemeState {
       return { theme: 'system', highContrast: resolveSystemHighContrast() };
     }
     const parsed = JSON.parse(raw) as Partial<PersistedThemeState>;
+    const theme: ThemeMode =
+      parsed.theme === 'dark' || parsed.theme === 'light' || parsed.theme === 'pipboy'
+        ? parsed.theme
+        : 'system';
     return {
-      theme: parsed.theme === 'dark' || parsed.theme === 'light' ? parsed.theme : 'system',
+      theme,
       highContrast: Boolean(parsed.highContrast),
     };
   } catch {

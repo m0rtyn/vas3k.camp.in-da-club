@@ -7,14 +7,15 @@
  * plus `<meta name="theme-color">` for native UI chrome.
  */
 
-export type ThemeMode = 'system' | 'dark' | 'light';
-export type ResolvedTheme = 'dark' | 'light';
+export type ThemeMode = 'system' | 'dark' | 'light' | 'pipboy';
+export type ResolvedTheme = 'dark' | 'light' | 'pipboy';
 
 export const THEME_STORAGE_KEY = 'vklube-theme';
 
 const META_COLORS: Record<ResolvedTheme, { normal: string; contrast: string }> = {
   dark: { normal: '#1a1a1a', contrast: '#000000' },
   light: { normal: '#ffffff', contrast: '#ffffff' },
+  pipboy: { normal: '#0b1410', contrast: '#0b1410' },
 };
 
 export function resolveSystemTheme(): ResolvedTheme {
@@ -28,7 +29,8 @@ export function resolveSystemHighContrast(): boolean {
 }
 
 export function resolveTheme(mode: ThemeMode): ResolvedTheme {
-  return mode === 'system' ? resolveSystemTheme() : mode;
+  if (mode === 'system') return resolveSystemTheme();
+  return mode;
 }
 
 export function applyTheme(mode: ThemeMode, highContrast: boolean): void {
@@ -37,7 +39,9 @@ export function applyTheme(mode: ThemeMode, highContrast: boolean): void {
   const root = document.documentElement;
 
   root.setAttribute('data-theme', resolved);
-  if (highContrast) {
+  // Pip-Boy theme ignores the high-contrast modifier (its palette is already extreme).
+  const effectiveContrast = resolved === 'pipboy' ? false : highContrast;
+  if (effectiveContrast) {
     root.setAttribute('data-contrast', 'more');
   } else {
     root.removeAttribute('data-contrast');
@@ -46,6 +50,6 @@ export function applyTheme(mode: ThemeMode, highContrast: boolean): void {
   const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
   if (meta) {
     const palette = META_COLORS[resolved];
-    meta.setAttribute('content', highContrast ? palette.contrast : palette.normal);
+    meta.setAttribute('content', effectiveContrast ? palette.contrast : palette.normal);
   }
 }
