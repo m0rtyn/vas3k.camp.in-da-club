@@ -1,0 +1,64 @@
+.card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  margin-bottom: 16px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.cardLink {
+  cursor: pointer;
+  transition: transform 0.08s ease, border-color 0.15s ease;
+}
+
+.cardLink:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-1px);
+}
+
+.cardDisabled {
+  opacity: 0.85;
+  cursor: default;
+}
+
+.icon {
+  font-size: 28px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.title {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.subtitle {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.countdown {
+  margin-top: 4px;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--color-text);
+  letter-spacing: 0.01em;
+}
+
+.countdownUrgent {
+  color: var(--color-error, #e0464a);
+}
