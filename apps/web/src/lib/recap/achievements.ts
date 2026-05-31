@@ -65,19 +65,55 @@ export function evaluateAchievements(ctx: EvaluateContext): Achievement[] {
       earnedByMe: g.top_networker.username === me,
     });
   }
-  if (g?.top_witness) {
+  if (g?.top_raw_networker) {
+    out.push({
+      id: 'top_raw_networker',
+      emoji: '🦾',
+      title: 'Непросто машина',
+      description: 'Больше всего встреч всего (включая неподтверждённые)',
+      scope: 'global',
+      value: `${g.top_raw_networker.count} встреч`,
+      holder: {
+        username: g.top_raw_networker.username,
+        display_name: g.top_raw_networker.display_name,
+      },
+      earnedByMe: g.top_raw_networker.username === me,
+    });
+  }
+  if (g?.top_anarchist) {
+    out.push({
+      id: 'top_anarchist',
+      emoji: '🧨',
+      title: 'Анархист',
+      description: 'Больше всего неподтверждённых встреч',
+      scope: 'global',
+      value: `${g.top_anarchist.count} неподтв.`,
+      holder: {
+        username: g.top_anarchist.username,
+        display_name: g.top_anarchist.display_name,
+      },
+      earnedByMe: g.top_anarchist.username === me,
+    });
+  }
+  if (g?.top_witness && g.top_witness.length > 0) {
+    const myIndex = g.top_witness.findIndex((w) => w.username === me);
+    const place = myIndex >= 0 ? myIndex + 1 : null;
+    // Show the gold holder in the card; if I'm in top-3 elsewhere, value reflects my place.
+    const gold = g.top_witness[0]!;
     out.push({
       id: 'top_witness',
       emoji: '💍',
       title: 'Сваха',
-      description: 'Чаще всех подтверждал чужие встречи',
+      description:
+        place && place > 1
+          ? `Топ-3 по подтверждениям чужих встреч (твоё место: ${place})`
+          : 'Топ-3 по подтверждениям чужих встреч',
       scope: 'global',
-      value: `${g.top_witness.count} подтверждений`,
-      holder: {
-        username: g.top_witness.username,
-        display_name: g.top_witness.display_name,
-      },
-      earnedByMe: g.top_witness.username === me,
+      value: place
+        ? `${g.top_witness[place - 1]!.count} подтверждений`
+        : `${gold.count} подтверждений`,
+      holder: { username: gold.username, display_name: gold.display_name },
+      earnedByMe: place !== null,
     });
   }
 

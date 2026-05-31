@@ -167,13 +167,43 @@ export const mockStats: RecapStats = {
       avatar_url: null,
       count: 31,
     },
-    top_witness: {
-      username: 'm0rtyn',
-      camp_username: 'jovial-martyn',
-      display_name: 'Мартын',
+    top_raw_networker: {
+      username: 'vasily',
+      camp_username: 'serene-vasily',
+      display_name: 'Василий',
       avatar_url: null,
-      count: 12,
+      count: 42,
     },
+    top_anarchist: {
+      username: 'pasha',
+      camp_username: 'lazy-pasha',
+      display_name: 'Паша',
+      avatar_url: null,
+      count: 9,
+    },
+    top_witness: [
+      {
+        username: 'm0rtyn',
+        camp_username: 'jovial-martyn',
+        display_name: 'Мартын',
+        avatar_url: null,
+        count: 12,
+      },
+      {
+        username: 'kate',
+        camp_username: 'wild-kate',
+        display_name: 'Катя',
+        avatar_url: null,
+        count: 10,
+      },
+      {
+        username: 'igor',
+        camp_username: 'silent-igor',
+        display_name: 'Игорь',
+        avatar_url: null,
+        count: 8,
+      },
+    ],
   },
 };
 

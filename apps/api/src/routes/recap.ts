@@ -116,22 +116,74 @@ async function computeStats(): Promise<RecapStats> {
   `);
   const topNetworkerRow = (topNetworkerResult as unknown as HolderRow[])[0];
 
-  // Top witness.
+  // Top witness — TOP 3 by distinct confirmed meetings witnessed.
+  // Defensive COUNT(DISTINCT m.id) in case sync ever produces duplicate
+  // rows for the same meeting (shouldn't, but cheap insurance).
   const topWitnessResult = await db.execute(sql`
     SELECT
       m.witness_username AS username,
       u.camp_username,
       u.display_name,
       u.avatar_url,
-      COUNT(*)::int AS count
+      COUNT(DISTINCT m.id)::int AS count
     FROM meetings m
     JOIN users u ON u.username = m.witness_username
     WHERE m.status = 'confirmed' AND m.witness_username IS NOT NULL
     GROUP BY m.witness_username, u.camp_username, u.display_name, u.avatar_url
     ORDER BY count DESC, username ASC
+    LIMIT 3
+  `);
+  const topWitnessRows = topWitnessResult as unknown as HolderRow[];
+
+  // Top anarchist — most UNCONFIRMED meetings as initiator OR target.
+  const topAnarchistResult = await db.execute(sql`
+    WITH per_user AS (
+      SELECT username, COUNT(*)::int AS cnt
+      FROM (
+        SELECT initiator_username AS username FROM meetings WHERE status = 'unconfirmed'
+        UNION ALL
+        SELECT target_username AS username FROM meetings WHERE status = 'unconfirmed'
+      ) AS m
+      GROUP BY username
+    )
+    SELECT
+      p.username,
+      u.camp_username,
+      u.display_name,
+      u.avatar_url,
+      p.cnt AS count
+    FROM per_user p
+    JOIN users u ON u.username = p.username
+    WHERE p.cnt > 0
+    ORDER BY p.cnt DESC, p.username ASC
     LIMIT 1
   `);
-  const topWitnessRow = (topWitnessResult as unknown as HolderRow[])[0];
+  const topAnarchistRow = (topAnarchistResult as unknown as HolderRow[])[0];
+
+  // Top raw networker — most TOTAL meetings (confirmed + unconfirmed).
+  // Excludes cancelled.
+  const topRawNetworkerResult = await db.execute(sql`
+    WITH per_user AS (
+      SELECT username, COUNT(*)::int AS cnt
+      FROM (
+        SELECT initiator_username AS username FROM meetings WHERE status IN ('confirmed', 'unconfirmed')
+        UNION ALL
+        SELECT target_username AS username FROM meetings WHERE status IN ('confirmed', 'unconfirmed')
+      ) AS m
+      GROUP BY username
+    )
+    SELECT
+      p.username,
+      u.camp_username,
+      u.display_name,
+      u.avatar_url,
+      p.cnt AS count
+    FROM per_user p
+    JOIN users u ON u.username = p.username
+    ORDER BY p.cnt DESC, p.username ASC
+    LIMIT 1
+  `);
+  const topRawNetworkerRow = (topRawNetworkerResult as unknown as HolderRow[])[0];
 
   return {
     median: num(statsRow?.median),
@@ -171,13 +223,29 @@ async function computeStats(): Promise<RecapStats> {
             count: num(topNetworkerRow.count),
           }
         : null,
-      top_witness: topWitnessRow
+      top_witness: topWitnessRows.map((row) => ({
+        username: row.username,
+        camp_username: row.camp_username,
+        display_name: row.display_name,
+        avatar_url: row.avatar_url,
+        count: num(row.count),
+      })),
+      top_anarchist: topAnarchistRow
         ? {
-            username: topWitnessRow.username,
-            camp_username: topWitnessRow.camp_username,
-            display_name: topWitnessRow.display_name,
-            avatar_url: topWitnessRow.avatar_url,
-            count: num(topWitnessRow.count),
+            username: topAnarchistRow.username,
+            camp_username: topAnarchistRow.camp_username,
+            display_name: topAnarchistRow.display_name,
+            avatar_url: topAnarchistRow.avatar_url,
+            count: num(topAnarchistRow.count),
+          }
+        : null,
+      top_raw_networker: topRawNetworkerRow
+        ? {
+            username: topRawNetworkerRow.username,
+            camp_username: topRawNetworkerRow.camp_username,
+            display_name: topRawNetworkerRow.display_name,
+            avatar_url: topRawNetworkerRow.avatar_url,
+            count: num(topRawNetworkerRow.count),
           }
         : null,
     },

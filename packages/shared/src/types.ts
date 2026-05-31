@@ -111,8 +111,12 @@ export interface RecapStats {
       | null;
     /** User with the most confirmed meetings. */
     top_networker: (AchievementHolder & { count: number }) | null;
-    /** User who acted as witness the most times. */
-    top_witness: (AchievementHolder & { count: number }) | null;
+    /** Top-3 users who acted as witness the most times. */
+    top_witness: Array<AchievementHolder & { count: number }>;
+    /** User with the most UNCONFIRMED meetings. */
+    top_anarchist: (AchievementHolder & { count: number }) | null;
+    /** User with the most total meetings (confirmed + unconfirmed). */
+    top_raw_networker: (AchievementHolder & { count: number }) | null;
   };
 }
 
