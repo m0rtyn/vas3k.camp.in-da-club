@@ -4,6 +4,7 @@ import {
   CAMP_TIMEZONE,
   isCampOver,
   type LeaderboardEntry,
+  type Meeting,
   type RecapGraph,
   type RecapStats,
 } from '@vklube/shared';
@@ -71,6 +72,7 @@ function RecapContent() {
   const [stats, setStats] = useState<RecapStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
   const [graphData, setGraphData] = useState<RecapGraph | null>(null);
+  const [witnessedMeetings, setWitnessedMeetings] = useState<Meeting[]>([]);
   const [displayNames, setDisplayNames] = useState<Map<string, string>>(() => new Map());
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [myRank, setMyRank] = useState<number | null>(null);
@@ -111,10 +113,22 @@ function RecapContent() {
         /* fall back to @username in export */
       }
     };
+    const loadWitnessed = async () => {
+      // GET /api/meetings only returns meetings where user is initiator/target.
+      // Witness-only meetings live in /api/meetings/witnessed — fetch them
+      // separately so the recap hero/funStats can count свидетельства.
+      try {
+        const data = await api.get<Meeting[]>('/meetings/witnessed');
+        if (!cancelled) setWitnessedMeetings(data);
+      } catch {
+        /* ignore — hero will show 0, same as before */
+      }
+    };
     if (navigator.onLine) {
       loadStats();
       loadGraph();
       loadProfiles();
+      loadWitnessed();
     } else {
       setStatsLoading(false);
     }
@@ -124,6 +138,7 @@ function RecapContent() {
       loadStats();
       loadGraph();
       loadProfiles();
+      loadWitnessed();
     };
     const goOffline = () => setIsOffline(true);
     window.addEventListener('online', goOnline);
@@ -153,10 +168,20 @@ function RecapContent() {
     };
   }, []);
 
-  const ctx: RecapContext | null = useMemo(
-    () => (user ? { meetings, currentUser: user } : null),
-    [meetings, user],
-  );
+  const ctx: RecapContext | null = useMemo(() => {
+    if (!user) return null;
+    // Merge witness-only meetings (not stored in useMeetingsStore) with the
+    // user's own meetings, deduping by id so selectors can count свидетельства.
+    if (witnessedMeetings.length === 0) {
+      return { meetings, currentUser: user };
+    }
+    const seen = new Set(meetings.map((m) => m.id));
+    const merged = [...meetings];
+    for (const w of witnessedMeetings) {
+      if (!seen.has(w.id)) merged.push(w);
+    }
+    return { meetings: merged, currentUser: user };
+  }, [meetings, witnessedMeetings, user]);
 
   if (!user || !ctx) return null;
 
