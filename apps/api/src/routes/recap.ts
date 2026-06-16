@@ -346,7 +346,7 @@ recap.get('/profiles', async (c) => {
   const user = c.get('user');
 
   const rows = await db.execute(sql`
-    SELECT u.username, u.display_name
+    SELECT u.username, u.display_name, u.telegram
     FROM users u
     WHERE u.username IN (
       SELECT CASE
@@ -359,9 +359,10 @@ recap.get('/profiles', async (c) => {
     )
   `);
 
-  const profiles = (rows as unknown as { username: string; display_name: string }[]).map((r) => ({
+  const profiles = (rows as unknown as { username: string; display_name: string; telegram: string | null }[]).map((r) => ({
     username: r.username,
     display_name: r.display_name,
+    telegram: r.telegram,
   }));
 
   return c.json({ profiles });

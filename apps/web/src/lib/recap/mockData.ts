@@ -7,6 +7,7 @@ export const mockUser: User = {
   display_name: 'Мартын',
   avatar_url: '',
   bio: 'Тот самый Мартын, о котором никто не слышал.',
+  telegram: 'm0rtyn',
   approvals_available: 3,
   confirmed_contacts_count: 14,
   is_admin: false,

@@ -8,6 +8,11 @@ interface BuildArgs {
    * falls back to "@username".
    */
   displayNames?: Map<string, string>;
+  /**
+   * Map club-username → Telegram handle (without leading @). Optional; when a
+   * handle is present the contact gets a `telegram`/`telegramUrl` field.
+   */
+  telegrams?: Map<string, string>;
 }
 
 export interface ProfileEntry {
@@ -17,9 +22,14 @@ export interface ProfileEntry {
   label: string;
   /** Profile URL on vas3k.club. */
   url: string;
+  /** Telegram handle without leading @, or null when unknown. */
+  telegram: string | null;
+  /** Telegram deep link (https://t.me/<handle>), or null when unknown. */
+  telegramUrl: string | null;
 }
 
 const CLUB_USER_URL = 'https://vas3k.club/user/';
+const TELEGRAM_URL = 'https://t.me/';
 
 /**
  * Returns confirmed contacts in chronological order — oldest meeting first.
@@ -29,6 +39,7 @@ export function buildProfilesList({
   meetings,
   currentUser,
   displayNames,
+  telegrams,
 }: BuildArgs): ProfileEntry[] {
   const me = currentUser.username;
   const seen = new Map<string, string>(); // username → earliest confirmed_at
@@ -52,20 +63,28 @@ export function buildProfilesList({
     .map(([username]) => {
       const name = displayNames?.get(username);
       const label = name && name !== username ? name : `@${username}`;
+      const telegram = telegrams?.get(username) ?? null;
       return {
         username,
         label,
         url: `${CLUB_USER_URL}${encodeURIComponent(username)}/`,
+        telegram,
+        telegramUrl: telegram ? `${TELEGRAM_URL}${telegram}` : null,
       };
     });
 }
 
 /**
- * Plain-text representation of the contact list — one `Имя: URL` per line.
- * Used for clipboard copy.
+ * Plain-text representation of the contact list — one line per contact.
+ * Includes the Telegram link when known. Used for clipboard copy.
  */
 export function formatProfilesText(list: ProfileEntry[]): string {
-  return list.map((p) => `${p.label}: ${p.url}`).join('\n');
+  return list
+    .map((p) => {
+      const tg = p.telegramUrl ? ` — ${p.telegramUrl}` : '';
+      return `${p.label}: ${p.url}${tg}`;
+    })
+    .join('\n');
 }
 
 /** Copies text to clipboard with a graceful fallback. Returns true on success. */
