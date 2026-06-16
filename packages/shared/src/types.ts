@@ -6,6 +6,7 @@ export interface User {
   display_name: string;
   avatar_url: string;
   bio: string | null;
+  telegram: string | null;
   approvals_available: number;
   confirmed_contacts_count: number;
   is_admin: boolean;

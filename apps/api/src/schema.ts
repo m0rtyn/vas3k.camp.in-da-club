@@ -31,6 +31,9 @@ export const users = pgTable(
     display_name: text('display_name').notNull(),
     avatar_url: text('avatar_url').notNull().default(''),
     bio: text('bio'),
+    // Telegram handle (without leading @), parsed from `bio`. Nullable when no
+    // Telegram link could be reliably extracted — see scripts/parse-telegram.ts.
+    telegram: text('telegram'),
     approvals_available: integer('approvals_available').notNull().default(5),
     confirmed_contacts_count: integer('confirmed_contacts_count').notNull().default(0),
     is_admin: boolean('is_admin').notNull().default(false),

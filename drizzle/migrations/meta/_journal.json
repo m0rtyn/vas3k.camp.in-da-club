@@ -29,6 +29,13 @@
       "when": 1779200000000,
       "tag": "0003_initial_approvals_5",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1781612912395,
+      "tag": "0004_dizzy_cyclops",
+      "breakpoints": true
     }
   ]
 }
