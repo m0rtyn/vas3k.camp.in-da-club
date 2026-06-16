@@ -68,6 +68,18 @@
   text-decoration: underline;
 }
 
+.telegram {
+  color: var(--color-accent);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.telegram:hover {
+  text-decoration: underline;
+}
+
 .button {
   display: inline-flex;
   align-items: center;

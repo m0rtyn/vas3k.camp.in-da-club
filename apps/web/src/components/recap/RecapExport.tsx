@@ -28,7 +28,7 @@ export function RecapExport({ profiles }: Props) {
     <section className={styles.section}>
       <h2 className={styles.title}>Список контактов</h2>
       <p className={styles.subtitle}>
-        {profiles.length} {pluralize(profiles.length, ['человек', 'человека', 'человек'])} с
+        {profiles.length} {pluralize(profiles.length, ['контакт', 'контакта', 'контактов'])} с
         подтверждёнными встречами, в порядке знакомства.
       </p>
 
@@ -44,6 +44,16 @@ export function RecapExport({ profiles }: Props) {
             >
               {p.url.replace(/^https?:\/\//, '')}
             </a>
+            {p.telegramUrl && (
+              <a
+                href={p.telegramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.telegram}
+              >
+                TG: @{p.telegram}
+              </a>
+            )}
           </li>
         ))}
       </ol>

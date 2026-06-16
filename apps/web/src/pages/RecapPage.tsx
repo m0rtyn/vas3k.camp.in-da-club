@@ -74,6 +74,7 @@ function RecapContent() {
   const [graphData, setGraphData] = useState<RecapGraph | null>(null);
   const [witnessedMeetings, setWitnessedMeetings] = useState<Meeting[]>([]);
   const [displayNames, setDisplayNames] = useState<Map<string, string>>(() => new Map());
+  const [telegrams, setTelegrams] = useState<Map<string, string>>(() => new Map());
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [myRank, setMyRank] = useState<number | null>(null);
 
@@ -103,11 +104,18 @@ function RecapContent() {
     };
     const loadProfiles = async () => {
       try {
-        const data = await api.get<{ profiles: { username: string; display_name: string }[] }>(
-          '/recap/profiles',
-        );
+        const data = await api.get<{
+          profiles: { username: string; display_name: string; telegram: string | null }[];
+        }>('/recap/profiles');
         if (!cancelled) {
           setDisplayNames(new Map(data.profiles.map((p) => [p.username, p.display_name])));
+          setTelegrams(
+            new Map(
+              data.profiles
+                .filter((p) => p.telegram)
+                .map((p) => [p.username, p.telegram as string]),
+            ),
+          );
         }
       } catch {
         /* fall back to @username in export */
@@ -205,6 +213,7 @@ function RecapContent() {
     meetings,
     currentUser: user,
     displayNames,
+    telegrams,
   });
 
   return (
