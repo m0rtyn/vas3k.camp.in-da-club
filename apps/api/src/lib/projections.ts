@@ -26,6 +26,19 @@ export const witnessCampUsername = sql<string | null>`(
 )`.as('witness_camp_username');
 
 /**
+ * Correlated subqueries resolving each participant's club slug to their
+ * `users.display_name` (real name). Surfaced so the UI can show the real name
+ * alongside the familiar `@slug` in the contacts list.
+ */
+export const initiatorDisplayName = sql<string>`(
+  SELECT u.display_name FROM ${users} u WHERE u.username = ${meetings.initiator_username}
+)`.as('initiator_display_name');
+
+export const targetDisplayName = sql<string>`(
+  SELECT u.display_name FROM ${users} u WHERE u.username = ${meetings.target_username}
+)`.as('target_display_name');
+
+/**
  * Standard projection for Meeting wire responses. Excludes raw club slugs
  * (initiator_username / target_username / witness_username) and the
  * `hidden_by` array (which contains slugs and would leak the club identity).
@@ -48,8 +61,10 @@ export function meetingProjection(currentUserSlug: string) {
     id: meetings.id,
     initiator_username: meetings.initiator_username,
     initiator_camp_username: initiatorCampUsername,
+    initiator_display_name: initiatorDisplayName,
     target_username: meetings.target_username,
     target_camp_username: targetCampUsername,
+    target_display_name: targetDisplayName,
     witness_username: meetings.witness_username,
     witness_camp_username: witnessCampUsername,
     witness_code: meetings.witness_code,

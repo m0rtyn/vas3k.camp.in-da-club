@@ -18,10 +18,14 @@ export interface Meeting {
   initiator_username: string;
   /** Camp username of the meeting initiator. Used in URLs / NFC chips. */
   initiator_camp_username: string;
+  /** Real name (display_name) of the meeting initiator. */
+  initiator_display_name: string;
   /** Club slug of the meeting target. */
   target_username: string;
   /** Camp username of the meeting target. */
   target_camp_username: string;
+  /** Real name (display_name) of the meeting target. */
+  target_display_name: string;
   witness_code: string | null;
   witness_code_expires_at: string | null;
   /** Club slug of the witness, if any. */

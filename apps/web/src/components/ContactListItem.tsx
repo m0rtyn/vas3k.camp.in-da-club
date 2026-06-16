@@ -20,6 +20,9 @@ export function ContactListItem({
   const otherCampUsername = isInitiator
     ? meeting.target_camp_username
     : meeting.initiator_camp_username;
+  const otherDisplayName = isInitiator
+    ? meeting.target_display_name
+    : meeting.initiator_display_name;
 
   const isConfirmed = meeting.status === 'confirmed';
   const date = new Date(meeting.created_at).toLocaleDateString('ru-RU', {
@@ -39,7 +42,10 @@ export function ContactListItem({
       </div>
 
       <Link to={`/${otherCampUsername}`} className={styles.info}>
-        <div className={styles.name}>@{otherUsername}</div>
+        <div className={styles.name}>
+          {otherDisplayName && <span>{otherDisplayName}</span>}
+          <span className={styles.username}>@{otherUsername}</span>
+        </div>
         <div className={styles.meta}>
           <span>{date}</span>
           <span className={`${styles.badge} ${isConfirmed ? styles.badgeConfirmed : styles.badgeUnconfirmed}`}>
